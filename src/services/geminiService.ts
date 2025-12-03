@@ -8,9 +8,15 @@ const processBatch = async (
   tweets: TweetRaw[],
   categories: string[]
 ): Promise<ProcessedTweetResult[]> => {
-  // Use process.env.API_KEY as mandated by guidelines.
-  // This also fixes the TS error regarding import.meta.env
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  // FIX: En local amb Vite hem de fer servir import.meta.env
+  const apiKey = import.meta.env.VITE_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("API Key not found. Make sure VITE_API_KEY is defined in your .env file.");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   // TRUNCATE text to prevent massive context windows or reflection issues
   const simplifiedTweets = tweets.map((t) => ({
