@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================== */
+/*          ELS TEUS RETOCS CSS VAN AQUÍ          */
+/* ============================================== */
+
+/* Pots fer servir CSS normal o regles de Tailwind amb @apply */
+
+@media only screen and (max-width: 768px) {
+    header {
+        margin-top: 55px;
+    }
+
+    header button:nth-child(1) {
+        display: none;
+    }
+
+    header .h-8.w-px.bg-gray-300.mx-1 {
+        display: none;
+    }
+
+    header button,
+    header .cursor-pointer {
+        display: none !important;
+    }
+
+    header.p-6 {
+        padding-bottom: 0;
+    }
+
+    main.max-w-\[1600px\].mx-auto.p-6.flex.flex-col.gap-12.mt-4.md\:mt-4.pt-16.md\:pt-4 {
+        padding-top: 0.5rem !important;
+    }
+}
