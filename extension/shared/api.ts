@@ -45,6 +45,16 @@ export async function getCategories(): Promise<string[]> {
   }
 }
 
+// POST updated categories list (adds new category)
+export async function saveCategories(categories: string[]): Promise<void> {
+  try {
+    await apiRequest<APISaveResponse>('categories', 'POST', { data: categories });
+  } catch (error) {
+    console.error('Error saving categories:', error);
+    throw error;
+  }
+}
+
 // POST new bookmark (appends to existing bookmarks)
 export async function saveBookmark(bookmark: Bookmark): Promise<void> {
   try {

@@ -15,7 +15,9 @@ export const ERRORS = {
   NO_CATEGORY: "Selecciona almenys una categoria",
   DUPLICATE: "Aquest enllaç ja està guardat",
   API_ERROR: "Error de connexió amb el servidor",
-  UNKNOWN: "Error desconegut. Torna-ho a intentar."
+  UNKNOWN: "Error desconegut. Torna-ho a intentar.",
+  CATEGORY_EXISTS: "Aquesta categoria ja existeix",
+  CATEGORY_EMPTY: "El nom de la categoria no pot estar buit"
 };
 
 // UI strings in Catalan
@@ -33,5 +35,7 @@ export const UI_STRINGS = {
   LABEL_CATEGORIES: "Categories:",
   SUCCESS: "Bookmark afegit correctament!",
   DUPLICATE_WARNING: "Aquest enllaç ja existeix!",
-  DUPLICATE_MESSAGE: "Aquesta pàgina ja està guardada a la teva col·lecció."
+  DUPLICATE_MESSAGE: "Aquesta pàgina ja està guardada a la teva col·lecció.",
+  NEW_CATEGORY_PLACEHOLDER: "Nova categoria...",
+  ADD_CATEGORY: "Afegir"
 };
