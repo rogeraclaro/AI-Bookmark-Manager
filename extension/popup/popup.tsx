@@ -12,6 +12,8 @@ export default function Popup() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
 
   // Load metadata and categories on mount
   useEffect(() => {
@@ -77,6 +79,42 @@ export default function Popup() {
         return [...prev, category];
       }
     });
+  }
+
+  async function handleAddCategory() {
+    const trimmedName = newCategoryName.trim();
+
+    if (!trimmedName) {
+      setError(ERRORS.CATEGORY_EMPTY);
+      return;
+    }
+
+    if (categories.includes(trimmedName)) {
+      setError(ERRORS.CATEGORY_EXISTS);
+      return;
+    }
+
+    setIsAddingCategory(true);
+    setError('');
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: 'ADD_CATEGORY',
+        data: { category: trimmedName }
+      });
+
+      if (response.success) {
+        setCategories(response.data);
+        setSelectedCategories(prev => [...prev, trimmedName]);
+        setNewCategoryName('');
+      } else {
+        setError(response.error || ERRORS.API_ERROR);
+      }
+    } catch (err: any) {
+      setError(err.message || ERRORS.API_ERROR);
+    } finally {
+      setIsAddingCategory(false);
+    }
   }
 
   async function handleSave() {
@@ -267,18 +305,39 @@ export default function Popup() {
         {/* Categories */}
         <div>
           <label className="block font-bold text-sm mb-2">🏷️ {UI_STRINGS.LABEL_CATEGORIES}</label>
-          <div className="border-2 border-black p-3 bg-gray-50 max-h-40 overflow-y-auto grid grid-cols-2 gap-1">
-            {categories.map(cat => (
-              <label key={cat} className="checkbox-label">
-                <input
-                  type="checkbox"
-                  className="checkbox-input"
-                  checked={selectedCategories.includes(cat)}
-                  onChange={() => toggleCategory(cat)}
-                />
-                <span>{cat}</span>
-              </label>
-            ))}
+          <div className="border-2 border-black p-3 bg-gray-50 max-h-40 overflow-y-auto">
+            <div className="grid grid-cols-2 gap-1">
+              {categories.map(cat => (
+                <label key={cat} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    className="checkbox-input"
+                    checked={selectedCategories.includes(cat)}
+                    onChange={() => toggleCategory(cat)}
+                  />
+                  <span>{cat}</span>
+                </label>
+              ))}
+            </div>
+            {/* Add new category */}
+            <div className="flex gap-2 mt-2 pt-2 border-t border-gray-300">
+              <input
+                type="text"
+                className="input flex-1 text-sm"
+                placeholder={UI_STRINGS.NEW_CATEGORY_PLACEHOLDER}
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                disabled={isAddingCategory}
+              />
+              <button
+                onClick={handleAddCategory}
+                disabled={isAddingCategory}
+                className="btn-secondary text-sm px-3"
+              >
+                {isAddingCategory ? '...' : UI_STRINGS.ADD_CATEGORY}
+              </button>
+            </div>
           </div>
         </div>
 
