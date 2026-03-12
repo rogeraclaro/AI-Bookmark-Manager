@@ -26,7 +26,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can save a webpage from the Chrome extension and it is automatically categorized by Claude
   3. The proxy server starts automatically at login on both Macs via LaunchAgent without manual intervention
   4. When the proxy is unreachable, bookmarks are saved without AI metadata (graceful fallback, no crash)
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Test scaffold (proxy unit tests + plist smoke test)
+- [ ] 01-02-PLAN.md — Proxy server: Express /categorize + /process-tweet + LaunchAgent setup
+- [ ] 01-03-PLAN.md — claudeService.ts drop-in replacement + App.tsx wiring
+- [ ] 01-04-PLAN.md — Extension: callClaudeProxy + manifest host_permissions + human verify
 
 ### Phase 2: Chrome Tabs Feature
 **Goal**: User can select multiple open Chrome tabs and save them all as AI-categorized bookmarks in one action
@@ -46,5 +52,5 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Claude Proxy | 0/TBD | Not started | - |
+| 1. Claude Proxy | 0/4 | Planned | - |
 | 2. Chrome Tabs Feature | 0/TBD | Not started | - |
