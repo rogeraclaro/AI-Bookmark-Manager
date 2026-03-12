@@ -20,6 +20,9 @@ export const ERRORS = {
   CATEGORY_EMPTY: "El nom de la categoria no pot estar buit"
 };
 
+// Claude proxy — local server that uses claude -p CLI subprocess
+export const CLAUDE_PROXY_URL = 'http://localhost:3838';
+
 // UI strings in Catalan
 export const UI_STRINGS = {
   TITLE: "AI Bookmark Manager",

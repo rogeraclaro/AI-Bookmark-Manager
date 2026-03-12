@@ -1,4 +1,4 @@
-import { API_CONFIG } from './config';
+import { API_CONFIG, CLAUDE_PROXY_URL } from './config';
 import type { Bookmark, APIBookmarksResponse, APICategoriesResponse, APISaveResponse } from './types';
 
 // Generic API request function
@@ -81,5 +81,27 @@ export async function isDuplicate(url: string): Promise<boolean> {
     console.error('Error checking duplicate:', error);
     // If error, allow saving (don't block user)
     return false;
+  }
+}
+
+// Call local Claude proxy to categorize a webpage.
+// Always resolves — never throws. Returns { categories: [] } when proxy is unreachable.
+export async function callClaudeProxy(data: {
+  url: string;
+  title: string;
+  description: string;
+}): Promise<{ categories: string[] }> {
+  try {
+    const response = await fetch(`${CLAUDE_PROXY_URL}/categorize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      signal: AbortSignal.timeout(10000) // 10s — shorter than proxy's 90s; fail fast
+    });
+    if (!response.ok) return { categories: [] };
+    return await response.json();
+  } catch {
+    // Proxy unreachable (ECONNREFUSED, timeout) — graceful fallback
+    return { categories: [] };
   }
 }
