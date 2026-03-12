@@ -12,7 +12,7 @@ This milestone replaces Gemini with Claude as the AI provider (via a local proxy
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Claude Proxy** - Build local proxy server and replace Gemini with Claude across the full stack
+- [x] **Phase 1: Claude Proxy** - Build local proxy server and replace Gemini with Claude across the full stack (completed 2026-03-12)
 - [ ] **Phase 2: Chrome Tabs Feature** - Add bulk tab selection and AI categorization to the extension popup
 
 ## Phase Details
@@ -52,5 +52,5 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Claude Proxy | 3/4 | In Progress|  |
+| 1. Claude Proxy | 4/4 | Complete   | 2026-03-12 |
 | 2. Chrome Tabs Feature | 0/TBD | Not started | - |

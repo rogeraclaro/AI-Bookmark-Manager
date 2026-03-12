@@ -10,13 +10,13 @@
 - [x] **PROXY-01**: El servidor local llegeix el token de sessió del Claude Code CLI (keychain / config file macOS)
 - [x] **PROXY-02**: El servidor exposa un endpoint HTTP local (`localhost:PORT`) que accepta peticions d'AI i les envia a l'Anthropic API
 - [x] **PROXY-03**: LaunchAgent macOS configurat per auto-start al login en ambdós Macs
-- [ ] **PROXY-04**: La web app i l'extensió criden el proxy local en lloc de Gemini directament
+- [x] **PROXY-04**: La web app i l'extensió criden el proxy local en lloc de Gemini directament
 
 ### Substitució Gemini → Claude
 
 - [x] **AI-01**: `claudeService.ts` substitueix `geminiService.ts` amb la mateixa interfície pública (`processBookmarksWithClaude`)
 - [x] **AI-02**: El processament de tweets (categorització, títol en català, descripció, `isAI`) funciona via Claude
-- [ ] **AI-03**: La categorització de pàgines web al guardar des de l'extensió funciona via Claude
+- [x] **AI-03**: La categorització de pàgines web al guardar des de l'extensió funciona via Claude
 - [x] **AI-04**: Gestió d'errors i fallback (bookmark sense AI si el proxy no és accessible) equivalent a l'actual
 
 ### Feature Pestanyes Chrome
@@ -51,10 +51,10 @@
 | PROXY-01 | Phase 1 | Complete |
 | PROXY-02 | Phase 1 | Complete |
 | PROXY-03 | Phase 1 | Complete |
-| PROXY-04 | Phase 1 | Pending |
+| PROXY-04 | Phase 1 | Complete |
 | AI-01 | Phase 1 | Complete |
 | AI-02 | Phase 1 | Complete |
-| AI-03 | Phase 1 | Pending |
+| AI-03 | Phase 1 | Complete |
 | AI-04 | Phase 1 | Complete |
 | TABS-01 | Phase 2 | Pending |
 | TABS-02 | Phase 2 | Pending |

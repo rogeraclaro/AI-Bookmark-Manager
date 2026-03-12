@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-claude-proxy/01-03-PLAN.md
-last_updated: "2026-03-12T23:18:08.472Z"
+stopped_at: "Checkpoint: human-verify Task 3 in 01-claude-proxy/01-04-PLAN.md"
+last_updated: "2026-03-12T23:30:49.885Z"
 last_activity: 2026-03-12 — Roadmap created, ready to plan Phase 1
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01-claude-proxy P03 | 2 | 2 tasks | 5 files |
 | Phase 01-claude-proxy P02 | 2min | 2 tasks | 6 files |
+| Phase 01-claude-proxy P04 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Recent decisions affecting current work:
 - [Phase 01-claude-proxy]: VITE_CLAUDE_PROXY_URL with hardcoded fallback to localhost:3838 for resilience when env var missing
 - [Phase 01-02]: createApp factory pattern for testability — allows injecting mock claude binary in tests
 - [Phase 01-02]: getChildEnv(input) accepts explicit env object for deterministic testing, defaults to process.env at runtime
+- [Phase 01-claude-proxy]: 10-second timeout chosen for callClaudeProxy so extension popup fails fast if proxy stalls
+- [Phase 01-claude-proxy]: callClaudeProxy always resolves (never throws) — extension UX never blocked by proxy availability
 
 ### Pending Todos
 
@@ -79,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T23:18:08.470Z
-Stopped at: Completed 01-claude-proxy/01-03-PLAN.md
+Last session: 2026-03-12T23:30:49.883Z
+Stopped at: Checkpoint: human-verify Task 3 in 01-claude-proxy/01-04-PLAN.md
 Resume file: None
