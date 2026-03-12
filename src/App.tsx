@@ -17,10 +17,9 @@ import {
 	Search,
 } from 'lucide-react'
 import type { Bookmark, Category, TweetRaw, LogEntry } from './types'
-import { processBookmarksWithGemini } from './services/geminiService'
+import { processBookmarksWithClaude } from './services/claudeService'
 import { storage } from './services/storage'
 import { Button, Input, Label, TextArea, Badge, Modal } from './components/UI'
-import { TrialCountdown } from './components/TrialCountdown'
 import { ScrollToTop } from './components/ScrollToTop'
 import { strings } from './translations'
 
@@ -407,7 +406,7 @@ export default function App() {
 		}
 
 		try {
-			const processed = await processBookmarksWithGemini(
+			const processed = await processBookmarksWithClaude(
 				uniqueTweets,
 				categories,
 				(c, t) => setProgress({ current: c, total: t }),
@@ -1835,8 +1834,7 @@ export default function App() {
 				</Modal>
 			)}
 
-			{/* Trial Countdown Widget */}
-			<TrialCountdown />
+	
 
 			{/* Scroll to Top Button */}
 			<ScrollToTop />
