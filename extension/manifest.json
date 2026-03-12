@@ -22,7 +22,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://ailinksdb.masellas.info/*"
+    "https://ailinksdb.masellas.info/*",
+    "http://localhost:3838/*"
   ],
   "background": {
     "service_worker": "background/service-worker.js",
