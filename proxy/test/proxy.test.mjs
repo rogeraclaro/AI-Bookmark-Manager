@@ -163,7 +163,7 @@ describe('POST /categorize', () => {
     const timeoutBin = path.resolve(__dirname, 'mock-claude-timeout.sh');
     // Write a temporary timeout script on the fly via shell
     const { execSync } = await import('node:child_process');
-    execSync(`printf '#!/bin/bash\\nsleep 30\\n' > ${timeoutBin} && chmod +x ${timeoutBin}`);
+    execSync(`printf '#!/bin/bash\\nsleep 30\\n' > "${timeoutBin}" && chmod +x "${timeoutBin}"`);
 
     let timeoutApp;
     try {
@@ -192,7 +192,7 @@ describe('POST /categorize', () => {
       assert.ok(body.error, 'error field should be present on timeout');
     } finally {
       await new Promise((resolve) => timeoutServer.close(resolve));
-      execSync(`rm -f ${timeoutBin}`);
+      execSync(`rm -f "${timeoutBin}"`);
     }
   });
 });
