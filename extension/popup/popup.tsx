@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { ExtractedMetadata, Bookmark, TabItem, TabSaveStatus, TabGroupColor, TabGroupInfo } from '../shared/types';
 import { UI_STRINGS, ERRORS } from '../shared/config';
-import { getBookmarks, callClaudeProxy } from '../shared/api';
+import { getBookmarks, getCategories, callClaudeProxy } from '../shared/api';
 import {
   filterTabsByGroup,
   hasGroups,
@@ -65,6 +65,15 @@ export default function Popup() {
         });
 
       setTabs(tabItems);
+
+      // Load categories so handleBulkSave can pass them to the proxy
+      try {
+        const cats = await getCategories();
+        if (cats.length > 0) setCategories(cats);
+      } catch {
+        // Non-fatal — proxy will do best-effort without category list
+      }
+
       setViewState('tabs');
     } catch (err) {
       console.error('Error loading tabs:', err);
@@ -269,15 +278,20 @@ export default function Popup() {
       setTabStatuses(prev => new Map(prev).set(tab.id, 'saving'));
 
       try {
-        const { categories } = await callClaudeProxy({
+        const aiResult = await callClaudeProxy({
           url: tab.url,
           title: tab.title,
           description: '',
+          categories,
         });
 
+        const base = buildTabBookmark(tab);
         const bookmark = {
-          ...buildTabBookmark(tab),
-          categories: categories.length > 0 ? categories : ['Altres'],
+          ...base,
+          // For tweets the proxy returns a clean title; for regular pages keep tab title
+          title: aiResult.title || base.title,
+          description: aiResult.description || base.description,
+          categories: aiResult.categories.length > 0 ? aiResult.categories : ['Altres'],
         };
 
         const saveResp = await chrome.runtime.sendMessage({
@@ -533,19 +547,19 @@ export default function Popup() {
         <div className="flex-1 overflow-y-auto">
           {savingTabs.map(tab => {
             const status = tabStatuses.get(tab.id) ?? 'pending';
-            const statusIcon =
-              status === 'pending' ? '○' :
-              status === 'saving'  ? '⟳' :
-              status === 'saved'   ? '✓' :
-                                     '✗';
             const statusColor =
               status === 'saved'  ? 'text-green-700' :
               status === 'failed' ? 'text-red-600'   :
               status === 'saving' ? 'text-blue-600'  :
                                      'text-gray-400';
+            const statusIcon = status === 'saving'
+              ? <span className="inline-block w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              : <span className={`font-bold text-sm flex-shrink-0 ${statusColor}`}>
+                  {status === 'pending' ? '○' : status === 'saved' ? '✓' : '✗'}
+                </span>;
             return (
               <div key={tab.id} className="flex items-center gap-2 px-3 py-2 border-b border-gray-200">
-                <span className={`font-bold text-sm flex-shrink-0 ${statusColor}`}>{statusIcon}</span>
+                {statusIcon}
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-xs truncate">{tab.title}</p>
                   <p className="text-xs text-gray-500 font-mono truncate">{tab.url}</p>

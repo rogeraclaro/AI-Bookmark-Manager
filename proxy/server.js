@@ -38,6 +38,21 @@ const categorizeSchema = {
   required: ['categories'],
 };
 
+// Richer schema for tweets: extracts a clean title + description + categories
+const tweetTabSchema = {
+  type: 'object',
+  properties: {
+    title: { type: 'string', maxLength: 80 },
+    description: { type: 'string', maxLength: 200 },
+    categories: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['title', 'categories'],
+};
+
+function isTweetUrl(url) {
+  return /^https?:\/\/(www\.)?(twitter\.com|x\.com)\/.+\/status\/\d+/i.test(url);
+}
+
 const tweetSchema = {
   type: 'object',
   properties: {
@@ -103,16 +118,45 @@ export function createApp({ claudeBin = DEFAULT_CLAUDE_BIN, claudeTimeout = DEFA
   }
 
   app.post('/categorize', async (req, res) => {
-    const { url, title, description } = req.body;
-    const prompt = `Categorize this bookmark in Catalan. Choose from existing categories.\nURL: ${url}\nTitle: ${title}\nDescription: ${description || ''}`;
+    const { url, title, description, categories: availableCategories } = req.body;
+    const categoriesStr = Array.isArray(availableCategories) && availableCategories.length > 0
+      ? `Categories disponibles: ${availableCategories.join(', ')}`
+      : 'Si no en trobes cap d\'adequada, usa "Altres".';
     const t0 = Date.now();
 
     try {
-      const result = await callClaude(prompt, categorizeSchema);
-      res.json({ categories: result?.categories || [] });
+      if (isTweetUrl(url)) {
+        // Tweet: extract clean title + description + categories from tweet text
+        const prompt = `Ets un assistent de categorització en català. Analitza aquest tweet i retorna:
+- title: un títol curt i descriptiu (màx 80 cars) que resumeixi de què tracta, NO copiar el text literalment
+- description: resum breu del contingut (màx 200 cars), opcional
+- categories: array d'1-2 categories adequades
+
+${categoriesStr}
+
+URL: ${url}
+Contingut del tweet (camp title del navegador): ${title}
+`;
+        const result = await callClaude(prompt, tweetTabSchema);
+        res.json({
+          title: result?.title || '',
+          description: result?.description || '',
+          categories: result?.categories || [],
+        });
+      } else {
+        // Regular page: categorize only
+        const prompt = `Ets un assistent de categorització en català. Assigna categories adequades a aquest bookmark.
+${categoriesStr}
+Retorna un array de màxim 2 categories.
+
+URL: ${url}
+Títol: ${title}
+Descripció: ${description || ''}`;
+        const result = await callClaude(prompt, categorizeSchema);
+        res.json({ categories: result?.categories || [] });
+      }
     } catch (err) {
       console.error('[proxy] /categorize failed after', Date.now() - t0, 'ms — code:', err.code, 'signal:', err.signal, 'killed:', err.killed, '\nstdout:', err.stdout?.slice(0, 500), '\nstderr:', err.stderr);
-      // Graceful fallback — never crash, bookmark saves without AI metadata
       res.json({ categories: [], error: err.message });
     }
   });
