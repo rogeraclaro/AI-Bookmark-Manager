@@ -288,9 +288,15 @@ export default function Popup() {
 
         const base = buildTabBookmark(tab);
 
-        // Extract Twitter/X username from URL (x.com/username/status/...)
-        const tweetAuthorMatch = tab.url.match(/(?:twitter\.com|x\.com)\/([^/]+)\/status\//i);
-        const tweetAuthor = tweetAuthorMatch ? `@${tweetAuthorMatch[1]}` : null;
+        // Extract Twitter/X author: @username from URL + display name from tab title
+        // Tab title format: "Display Name on X: \"tweet text\""
+        const tweetHandleMatch = tab.url.match(/(?:twitter\.com|x\.com)\/([^/]+)\/status\//i);
+        const tweetDisplayMatch = tab.title.match(/^(.+?)\s+on\s+(?:X|Twitter):/i);
+        const tweetAuthor = tweetHandleMatch
+          ? tweetDisplayMatch
+            ? `${tweetDisplayMatch[1]} (@${tweetHandleMatch[1]})`
+            : `@${tweetHandleMatch[1]}`
+          : null;
 
         // Only keep categories that exist in our list; never accept invented ones
         const validCategories = aiResult.categories.filter(c => categories.includes(c));
