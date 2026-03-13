@@ -43,7 +43,12 @@ Plans:
   2. User can filter the tab list by Chrome group or view only ungrouped tabs
   3. User can select multiple tabs via checkboxes and trigger a single bulk-save action
   4. All selected tabs are saved as bookmarks with Claude-generated categories and titles
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Manifest permissions + type contracts + vitest scaffold (TDD RED baseline)
+- [ ] 02-02-PLAN.md — tabsUtils.ts pure functions (tests GREEN) + popup.tsx tabs view (load/filter/select)
+- [ ] 02-03-PLAN.md — Bulk save loop + tabs-saving + tabs-summary views + human verify
 
 ## Progress
 
@@ -53,4 +58,4 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Claude Proxy | 4/4 | Complete   | 2026-03-13 |
-| 2. Chrome Tabs Feature | 0/TBD | Not started | - |
+| 2. Chrome Tabs Feature | 0/3 | Not started | - |
