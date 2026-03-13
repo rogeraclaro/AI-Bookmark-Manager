@@ -1,10 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { execFile } from 'child_process';
-import { promisify } from 'util';
+import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
-
-const execFileAsync = promisify(execFile);
 
 const PORT = 3838;
 const DEFAULT_CLAUDE_BIN = process.env.CLAUDE_BIN || 'claude';
@@ -64,30 +61,56 @@ export function createApp({ claudeBin = DEFAULT_CLAUDE_BIN, claudeTimeout = DEFA
 
   // Invoke claude -p as a subprocess and return parsed structured_output
   async function callClaude(prompt, schema) {
-    const { stdout } = await execFileAsync(claudeBin, [
-      '-p', prompt,
-      '--model', 'claude-sonnet-4-6',
-      '--output-format', 'json',
-      '--json-schema', JSON.stringify(schema),
-      '--no-session-persistence',
-    ], {
-      timeout: claudeTimeout,
-      cwd: '/tmp',
-      env: getChildEnv(),
+    console.log('[proxy] spawning claude...');
+    const result = await new Promise((resolve, reject) => {
+      const child = spawn(claudeBin, [
+        '-p', prompt,
+        '--model', 'claude-sonnet-4-6',
+        '--output-format', 'json',
+        '--json-schema', JSON.stringify(schema),
+        '--no-session-persistence',
+      ], {
+        cwd: '/tmp',
+        env: getChildEnv(),
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+
+      let stdout = '';
+      let stderr = '';
+      child.stdout.on('data', (d) => { stdout += d; });
+      child.stderr.on('data', (d) => { stderr += d; });
+
+      const timer = setTimeout(() => {
+        child.kill();
+        reject(Object.assign(new Error(`claude timeout after ${claudeTimeout}ms`), { stdout, stderr }));
+      }, claudeTimeout);
+
+      child.on('close', (code) => {
+        clearTimeout(timer);
+        if (code !== 0) {
+          reject(Object.assign(new Error(`claude exited ${code}`), { stdout, stderr }));
+        } else {
+          try {
+            resolve(JSON.parse(stdout));
+          } catch {
+            reject(Object.assign(new Error(`JSON parse failed`), { stdout: stdout.slice(0, 200), stderr }));
+          }
+        }
+      });
     });
-    const parsed = JSON.parse(stdout);
-    return parsed.structured_output;
+    return result.structured_output;
   }
 
   app.post('/categorize', async (req, res) => {
     const { url, title, description } = req.body;
     const prompt = `Categorize this bookmark in Catalan. Choose from existing categories.\nURL: ${url}\nTitle: ${title}\nDescription: ${description || ''}`;
+    const t0 = Date.now();
 
     try {
       const result = await callClaude(prompt, categorizeSchema);
       res.json({ categories: result?.categories || [] });
     } catch (err) {
-      console.error('[proxy] /categorize error:', err.message);
+      console.error('[proxy] /categorize failed after', Date.now() - t0, 'ms — code:', err.code, 'signal:', err.signal, 'killed:', err.killed, '\nstdout:', err.stdout?.slice(0, 500), '\nstderr:', err.stderr);
       // Graceful fallback — never crash, bookmark saves without AI metadata
       res.json({ categories: [], error: err.message });
     }
