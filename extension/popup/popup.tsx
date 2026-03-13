@@ -287,12 +287,20 @@ export default function Popup() {
         });
 
         const base = buildTabBookmark(tab);
+
+        // Extract Twitter/X username from URL (x.com/username/status/...)
+        const tweetAuthorMatch = tab.url.match(/(?:twitter\.com|x\.com)\/([^/]+)\/status\//i);
+        const tweetAuthor = tweetAuthorMatch ? `@${tweetAuthorMatch[1]}` : null;
+
+        // Only keep categories that exist in our list; never accept invented ones
+        const validCategories = aiResult.categories.filter(c => categories.includes(c));
+
         const bookmark = {
           ...base,
-          // For tweets the proxy returns a clean title; for regular pages keep tab title
           title: aiResult.title || base.title,
           description: aiResult.description || base.description,
-          categories: aiResult.categories.length > 0 ? aiResult.categories : ['Altres'],
+          author: tweetAuthor || base.author,
+          categories: validCategories.length > 0 ? validCategories : ['Altres'],
         };
 
         const saveResp = await chrome.runtime.sendMessage({
