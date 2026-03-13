@@ -33,6 +33,7 @@ export default function Popup() {
   const [groupFilter, setGroupFilter] = useState<'all' | 'ungrouped' | number>('all');
   const [selectedTabIds, setSelectedTabIds] = useState<Set<number>>(new Set());
   const [tabStatuses, setTabStatuses] = useState<Map<number, TabSaveStatus>>(new Map());
+  const [tabSaveResults, setTabSaveResults] = useState<Map<number, { title: string; categories: string[] }>>(new Map());
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Load tabs on mount (tabs view is default)
@@ -302,6 +303,10 @@ export default function Popup() {
         if (!saveResp.success) throw new Error(saveResp.error || 'Save failed');
 
         setTabStatuses(prev => new Map(prev).set(tab.id, 'saved'));
+        setTabSaveResults(prev => new Map(prev).set(tab.id, {
+          title: bookmark.title,
+          categories: bookmark.categories,
+        }));
       } catch {
         setTabStatuses(prev => new Map(prev).set(tab.id, 'failed'));
       }
@@ -575,6 +580,7 @@ export default function Popup() {
   // Tabs summary — all done
   if (viewState === 'tabs-summary') {
     const { saved, failed } = getTabSaveSummary(tabStatuses);
+    const savedTabs = tabs.filter(t => tabStatuses.get(t.id) === 'saved');
     const failedTabs = tabs.filter(t => tabStatuses.get(t.id) === 'failed');
     const failedIds = new Set(failedTabs.map(t => t.id));
 
@@ -583,19 +589,35 @@ export default function Popup() {
         <div className="bg-yellow-400 border-b-2 border-black p-3 flex-shrink-0">
           <h1 className="text-lg font-bold uppercase">🔖 {UI_STRINGS.TABS_SUMMARY_HEADING}</h1>
         </div>
-        <div className="p-4 space-y-3 flex-1">
-          <p className="font-bold text-sm text-green-700">{UI_STRINGS.TABS_SUMMARY_SAVED(saved)}</p>
-          {failed > 0 && (
-            <p className="font-bold text-sm text-red-600">{UI_STRINGS.TABS_SUMMARY_FAILED(failed)}</p>
+        <div className="flex-1 overflow-y-auto">
+          {/* Saved list with categories */}
+          {savedTabs.length > 0 && (
+            <div className="p-3 space-y-2">
+              <p className="font-bold text-xs text-green-700 uppercase">{UI_STRINGS.TABS_SUMMARY_SAVED(saved)}</p>
+              {savedTabs.map(t => {
+                const result = tabSaveResults.get(t.id);
+                return (
+                  <div key={t.id} className="border border-gray-200 rounded p-2 space-y-1">
+                    <p className="font-bold text-xs truncate">{result?.title || t.title}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {(result?.categories ?? []).map(cat => (
+                        <span key={cat} className="text-xs font-mono bg-yellow-100 border border-yellow-400 px-1 rounded">
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
-          {failed > 0 && (
-            <div>
-              <p className="text-xs font-bold mb-1">Pestanyes fallides:</p>
-              <ul className="text-xs font-mono space-y-1">
-                {failedTabs.map(t => (
-                  <li key={t.id} className="truncate text-red-700">{t.url}</li>
-                ))}
-              </ul>
+          {/* Failed list */}
+          {failedTabs.length > 0 && (
+            <div className="px-3 pb-3 space-y-1">
+              <p className="font-bold text-xs text-red-600 uppercase">{UI_STRINGS.TABS_SUMMARY_FAILED(failed)}</p>
+              {failedTabs.map(t => (
+                <p key={t.id} className="text-xs font-mono text-red-700 truncate">{t.url}</p>
+              ))}
             </div>
           )}
         </div>
