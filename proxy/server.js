@@ -120,8 +120,8 @@ export function createApp({ claudeBin = DEFAULT_CLAUDE_BIN, claudeTimeout = DEFA
   app.post('/categorize', async (req, res) => {
     const { url, title, description, categories: availableCategories } = req.body;
     const categoriesStr = Array.isArray(availableCategories) && availableCategories.length > 0
-      ? `Categories disponibles: ${availableCategories.join(', ')}`
-      : 'Si no en trobes cap d\'adequada, usa "Altres".';
+      ? `CATEGORIES VÀLIDES (NOMÉS pots triar d'aquesta llista, NO inventes categories noves): ${availableCategories.join(', ')}`
+      : 'Usa "Altres" si no encaixa en cap categoria específica.';
     const t0 = Date.now();
 
     try {
@@ -130,7 +130,7 @@ export function createApp({ claudeBin = DEFAULT_CLAUDE_BIN, claudeTimeout = DEFA
         const prompt = `Ets un assistent de categorització en català. Analitza aquest tweet i retorna:
 - title: un títol curt i descriptiu (màx 80 cars) que resumeixi de què tracta, NO copiar el text literalment
 - description: resum breu del contingut (màx 200 cars), opcional
-- categories: array d'1-2 categories adequades
+- categories: array d'1-2 categories (OBLIGATÒRIAMENT de la llista vàlida)
 
 ${categoriesStr}
 
@@ -147,7 +147,7 @@ Contingut del tweet (camp title del navegador): ${title}
         // Regular page: categorize only
         const prompt = `Ets un assistent de categorització en català. Assigna categories adequades a aquest bookmark.
 ${categoriesStr}
-Retorna un array de màxim 2 categories.
+Retorna un array de màxim 2 categories NOMÉS de la llista vàlida.
 
 URL: ${url}
 Títol: ${title}
