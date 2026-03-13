@@ -86,17 +86,19 @@ export async function isDuplicate(url: string): Promise<boolean> {
 
 // Call local Claude proxy to categorize a webpage.
 // Always resolves — never throws. Returns { categories: [] } when proxy is unreachable.
+// For tweet URLs the proxy also returns title and description.
 export async function callClaudeProxy(data: {
   url: string;
   title: string;
   description: string;
-}): Promise<{ categories: string[] }> {
+  categories?: string[];
+}): Promise<{ categories: string[]; title?: string; description?: string }> {
   try {
     const response = await fetch(`${CLAUDE_PROXY_URL}/categorize`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-      signal: AbortSignal.timeout(10000) // 10s — shorter than proxy's 90s; fail fast
+      signal: AbortSignal.timeout(30000) // 30s — tweets need more time
     });
     if (!response.ok) return { categories: [] };
     return await response.json();
