@@ -279,10 +279,26 @@ export default function Popup() {
       setTabStatuses(prev => new Map(prev).set(tab.id, 'saving'));
 
       try {
+        // For tweet tabs, extract full tweet body from the live DOM (lightweight inline script)
+        let tabDescription = '';
+        const isTweet = /(?:twitter\.com|x\.com)\/.+\/status\/\d+/i.test(tab.url);
+        if (isTweet) {
+          try {
+            const [{ result }] = await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: () => {
+                const el = document.querySelector('[data-testid="tweetText"]');
+                return (el as HTMLElement | null)?.innerText ?? '';
+              },
+            });
+            tabDescription = result ?? '';
+          } catch { /* tab not scriptable — fall back to title only */ }
+        }
+
         const aiResult = await callClaudeProxy({
           url: tab.url,
           title: tab.title,
-          description: '',
+          description: tabDescription,
           categories,
         });
 

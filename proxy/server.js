@@ -127,6 +127,7 @@ export function createApp({ claudeBin = DEFAULT_CLAUDE_BIN, claudeTimeout = DEFA
     try {
       if (isTweetUrl(url)) {
         // Tweet: extract clean title + description + categories from tweet text
+        const tweetBody = description ? `\nText complet del tweet:\n${description}` : '';
         const prompt = `Ets un assistent de categorització en català. Analitza aquest tweet i retorna:
 - title: un títol curt i descriptiu (màx 80 cars) que resumeixi de què tracta, NO copiar el text literalment
 - description: resum breu del contingut (màx 200 cars), opcional
@@ -134,8 +135,11 @@ export function createApp({ claudeBin = DEFAULT_CLAUDE_BIN, claudeTimeout = DEFA
 
 ${categoriesStr}
 
+IMPORTANT: El contingut pot estar en castellà, anglès o qualsevol idioma — fes correspondència semàntica amb les categories en català (ex: "agentes IA" → "Agents", "machine learning" → "Intel·ligència Artificial", "productivity" → "Productivitat").
+Usa "Altres" NOMÉS si cap categoria de la llista encaixa mínimament.
+
 URL: ${url}
-Contingut del tweet (camp title del navegador): ${title}
+Títol del tab: ${title}${tweetBody}
 `;
         const result = await callClaude(prompt, tweetTabSchema);
         res.json({
@@ -148,6 +152,8 @@ Contingut del tweet (camp title del navegador): ${title}
         const prompt = `Ets un assistent de categorització en català. Assigna categories adequades a aquest bookmark.
 ${categoriesStr}
 Retorna un array de màxim 2 categories NOMÉS de la llista vàlida.
+IMPORTANT: El contingut pot estar en qualsevol idioma — fes correspondència semàntica amb les categories en català.
+Usa "Altres" NOMÉS si cap categoria de la llista encaixa mínimament.
 
 URL: ${url}
 Títol: ${title}
