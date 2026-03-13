@@ -1,16 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import type { TabItem, TabSaveStatus } from '../shared/types';
 import type { Bookmark } from '../shared/types';
+import { buildTabBookmark, getTabSaveSummary } from '../popup/tabsUtils';
 
-// Save helper functions — will live in extension/popup/tabsUtils.ts (Plan 02/03).
-
-function buildTabBookmark(tab: TabItem): Bookmark {
-  throw new Error('Not implemented');
-}
-
-function getTabSaveSummary(statuses: Map<number, TabSaveStatus>): { saved: number; failed: number } {
-  throw new Error('Not implemented');
-}
+// Save helper functions — live in extension/popup/tabsUtils.ts.
 
 const makeTab = (overrides: Partial<TabItem> = {}): TabItem => ({
   id: 1,

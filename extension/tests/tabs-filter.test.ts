@@ -1,16 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import type { TabItem } from '../shared/types';
+import { filterTabsByGroup, hasGroups } from '../popup/tabsUtils';
 
 // Pure filter functions — extracted from popup logic, tested here in isolation.
-// These functions will live in extension/popup/tabsUtils.ts (created in Plan 02).
-
-function filterTabsByGroup(tabs: TabItem[], filter: 'all' | 'ungrouped' | number): TabItem[] {
-  throw new Error('Not implemented');
-}
-
-function hasGroups(tabs: TabItem[]): boolean {
-  throw new Error('Not implemented');
-}
 
 const makeTabs = (): TabItem[] => [
   { id: 1, title: 'Work A', url: 'https://work.example.com', favIconUrl: '', groupId: 10, groupColor: 'blue', groupTitle: 'Work', alreadySaved: false },

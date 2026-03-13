@@ -1,22 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { toggleTabSelection, selectAllVisible, deselectAllVisible, getSelectionCount } from '../popup/tabsUtils';
 
-// Selection helper functions — will live in extension/popup/tabsUtils.ts (Plan 02).
-
-function toggleTabSelection(selectedIds: Set<number>, id: number): Set<number> {
-  throw new Error('Not implemented');
-}
-
-function selectAllVisible(visibleIds: number[], selectedIds: Set<number>): Set<number> {
-  throw new Error('Not implemented');
-}
-
-function deselectAllVisible(visibleIds: number[], selectedIds: Set<number>): Set<number> {
-  throw new Error('Not implemented');
-}
-
-function getSelectionCount(selectedIds: Set<number>): number {
-  throw new Error('Not implemented');
-}
+// Selection helper functions — live in extension/popup/tabsUtils.ts.
 
 describe('toggleTabSelection', () => {
   it('adds id when not present', () => {
