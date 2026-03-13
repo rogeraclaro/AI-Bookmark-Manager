@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: "Checkpoint: human-verify Task 3 in 01-claude-proxy/01-04-PLAN.md"
-last_updated: "2026-03-12T23:30:49.885Z"
+stopped_at: Completed 01-claude-proxy/01-04-PLAN.md — Phase 1 fully verified
+last_updated: "2026-03-13T08:36:56.307Z"
 last_activity: 2026-03-12 — Roadmap created, ready to plan Phase 1
 progress:
   total_phases: 2
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-claude-proxy P03 | 2 | 2 tasks | 5 files |
 | Phase 01-claude-proxy P02 | 2min | 2 tasks | 6 files |
 | Phase 01-claude-proxy P04 | 2min | 2 tasks | 4 files |
+| Phase 01-claude-proxy P04 | ~10min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,7 @@ Recent decisions affecting current work:
 - [Phase 01-02]: getChildEnv(input) accepts explicit env object for deterministic testing, defaults to process.env at runtime
 - [Phase 01-claude-proxy]: 10-second timeout chosen for callClaudeProxy so extension popup fails fast if proxy stalls
 - [Phase 01-claude-proxy]: callClaudeProxy always resolves (never throws) — extension UX never blocked by proxy availability
+- [Phase 01-claude-proxy]: spawn with stdio:ignore chosen over execFile for claude -p subprocess — stdin must be closed or claude hangs waiting for input
 
 ### Pending Todos
 
@@ -82,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T23:30:49.883Z
-Stopped at: Checkpoint: human-verify Task 3 in 01-claude-proxy/01-04-PLAN.md
+Last session: 2026-03-13T08:36:56.304Z
+Stopped at: Completed 01-claude-proxy/01-04-PLAN.md — Phase 1 fully verified
 Resume file: None
