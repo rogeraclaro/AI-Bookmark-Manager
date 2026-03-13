@@ -79,6 +79,7 @@ export function createApp({ claudeBin = DEFAULT_CLAUDE_BIN, claudeTimeout = DEFA
       let stderr = '';
       child.stdout.on('data', (d) => { stdout += d; });
       child.stderr.on('data', (d) => { stderr += d; });
+      child.on('error', (err) => { clearTimeout(timer); reject(err); });
 
       const timer = setTimeout(() => {
         child.kill();
