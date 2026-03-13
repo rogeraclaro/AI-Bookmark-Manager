@@ -50,12 +50,42 @@ Plans:
 - [x] 02-02-PLAN.md — tabsUtils.ts pure functions (tests GREEN) + popup.tsx tabs view (load/filter/select)
 - [x] 02-03-PLAN.md — Bulk save loop + tabs-saving + tabs-summary views + human verify
 
+### Phase 3: Fix AI-03 — Wire Single-Save to Claude
+**Goal:** Restore Claude categorization for the single-page save form in the extension (regression from Phase 2 commit 0352d1b)
+**Depends on:** Phase 2
+**Requirements:** AI-03
+**Gap Closure:** Closes AI-03 requirement gap, integration gap (handleSave → callClaudeProxy), and broken E2E flow "Extension single-page save with Claude categorization"
+
+Plans:
+- [ ] 03-01-PLAN.md — Wire handleSave() in popup.tsx to call callClaudeProxy + apply categories + fallback
+
+### Phase 4: Nyquist Validation
+**Goal:** Both Phase 1 and Phase 2 achieve Nyquist validation compliance
+**Depends on:** Phase 3
+**Requirements:** (non-functional — process compliance)
+**Gap Closure:** Phase 1 VALIDATION.md fixed (nyquist_compliant: false → true); Phase 2 VALIDATION.md created
+
+Plans:
+- [ ] 04-01-PLAN.md — Fix Phase 1 VALIDATION.md and create Phase 2 VALIDATION.md
+
+### Phase 5: Tech Debt Cleanup
+**Goal:** Remove Gemini-era dead code and unused type dead code accumulated during migration
+**Depends on:** Phase 4
+**Requirements:** (non-functional — code hygiene)
+**Gap Closure:** TrialCountdown.tsx Gemini import removed; GET_BOOKMARKS dead type pruned from types.ts
+
+Plans:
+- [ ] 05-01-PLAN.md — Remove TrialCountdown Gemini import + GET_BOOKMARKS dead type
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Claude Proxy | 4/4 | Complete   | 2026-03-13 |
 | 2. Chrome Tabs Feature | 3/3 | Complete   | 2026-03-13 |
+| 3. Fix AI-03 — Wire Single-Save to Claude | 0/1 | Pending | — |
+| 4. Nyquist Validation | 0/1 | Pending | — |
+| 5. Tech Debt Cleanup | 0/1 | Pending | — |
