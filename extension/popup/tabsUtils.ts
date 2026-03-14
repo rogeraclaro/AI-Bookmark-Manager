@@ -44,12 +44,18 @@ export function getSelectionCount(selectedIds: Set<number>): number {
 
 // ---- Save helpers ----
 
+export function resolveAuthorFromUrl(url: string): string {
+  if (/github\.com/i.test(url)) return 'github';
+  if (/twitter\.com|x\.com/i.test(url)) return 'twitter';
+  return 'web';
+}
+
 export function buildTabBookmark(tab: TabItem): Bookmark {
   return {
     id: `ext_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     title: tab.title,
     description: '',
-    author: 'Extension',
+    author: resolveAuthorFromUrl(tab.url),
     originalLink: tab.url,
     externalLinks: [],
     categories: ['Altres'], // overwritten with Claude's categories in the save loop
