@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { ExtractedMetadata, Bookmark, TabItem, TabSaveStatus, TabGroupColor, TabGroupInfo } from '../shared/types';
 import { UI_STRINGS, ERRORS } from '../shared/config';
 import { getBookmarks, getCategories, callClaudeProxy } from '../shared/api';
+import { resolveSaveCategories } from './singleSaveUtils';
 import {
   filterTabsByGroup,
   hasGroups,
@@ -192,11 +193,6 @@ export default function Popup() {
       return;
     }
 
-    if (selectedCategories.length === 0) {
-      setError(ERRORS.NO_CATEGORY);
-      return;
-    }
-
     if (!metadata) {
       setError(ERRORS.UNKNOWN);
       return;
@@ -216,15 +212,27 @@ export default function Popup() {
         return;
       }
 
+      // Call Claude proxy for AI categorization (always resolves — proxy failure is silent)
+      const aiResult = await callClaudeProxy({
+        url: metadata.url,
+        title,
+        description,
+        categories,
+      });
+
+      const finalCategories = resolveSaveCategories(aiResult.categories, categories, selectedCategories);
+      const finalTitle = aiResult.title || title.trim();
+      const finalDescription = aiResult.description || description.trim();
+
       // Create bookmark object
       const bookmark: Bookmark = {
         id: `ext_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        title: title.trim(),
-        description: description.trim(),
+        title: finalTitle,
+        description: finalDescription,
         author: metadata.author || 'Extension',
         originalLink: metadata.url,
         externalLinks: [],
-        categories: selectedCategories,
+        categories: finalCategories,
         createdAt: Date.now()
       };
 
