@@ -1,0 +1,13 @@
+{
+  "planPath": "docs/plans/2026-03-14-mobile-share-target.md",
+  "tasks": [
+    {"id": 7, "subject": "Task 1: Bootstrap mobile/ project", "status": "pending"},
+    {"id": 8, "subject": "Task 2: PWA manifest + icons", "status": "pending", "blockedBy": [7]},
+    {"id": 9, "subject": "Task 3: Utils + tests", "status": "pending", "blockedBy": [7]},
+    {"id": 10, "subject": "Task 4: API + config layer", "status": "pending", "blockedBy": [7]},
+    {"id": 11, "subject": "Task 5: CSS + App.tsx UI", "status": "pending", "blockedBy": [9, 10]},
+    {"id": 12, "subject": "Task 6: Entry point + dev smoke test", "status": "pending", "blockedBy": [11]},
+    {"id": 13, "subject": "Task 7: Build + deploy script", "status": "pending", "blockedBy": [12]}
+  ],
+  "lastUpdated": "2026-03-14T00:00:00Z"
+}
