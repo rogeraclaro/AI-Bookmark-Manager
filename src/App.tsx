@@ -1605,7 +1605,7 @@ export default function App() {
 			>
 				<div className='mb-4'>
 					<p className='font-mono text-sm mb-4'>
-						Gemini ha descartat {rejectedTweets.length} tweet{rejectedTweets.length !== 1 ? 's' : ''} perquè
+						Claude ha descartat {rejectedTweets.length} tweet{rejectedTweets.length !== 1 ? 's' : ''} perquè
 						no estan relacionats amb IA o han fallat el processament. Selecciona els que vulguis afegir
 						igualment:
 					</p>
