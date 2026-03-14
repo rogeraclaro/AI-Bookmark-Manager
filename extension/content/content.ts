@@ -29,7 +29,7 @@ function extractMetadata(): ExtractedMetadata {
     document.querySelector('meta[name="author"]')?.getAttribute('content') ||
     document.querySelector('meta[property="article:author"]')?.getAttribute('content') ||
     document.querySelector('meta[name="twitter:creator"]')?.getAttribute('content') ||
-    'Extension';
+    '';
 
   // URL (always current page)
   const url = window.location.href;
