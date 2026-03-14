@@ -12,7 +12,6 @@ export const API_CONFIG = {
 export const ERRORS = {
   NO_TITLE: "El títol no pot estar buit",
   TITLE_TOO_LONG: "El títol no pot superar els 80 caràcters",
-  NO_CATEGORY: "Selecciona almenys una categoria",
   DUPLICATE: "Aquest enllaç ja està guardat",
   API_ERROR: "Error de connexió amb el servidor",
   UNKNOWN: "Error desconegut. Torna-ho a intentar.",
