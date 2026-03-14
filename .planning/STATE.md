@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: completed
 stopped_at: Completed 06-final-polish 06-01-PLAN.md
-last_updated: "2026-03-14T15:41:26.073Z"
+last_updated: "2026-03-14T15:46:22.750Z"
 last_activity: 2026-03-13 — Phase 2 complete, bulk save + summary + retry verified by user
 progress:
   total_phases: 6
@@ -18,10 +18,10 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-12)
+See: .planning/PROJECT.md (updated 2026-03-14)
 
-**Core value:** User can capture any web content and find it later organized by categories, without manual management
-**Current focus:** All phases complete
+**Core value:** L'usuari pot capturar qualsevol contingut web i trobar-lo més tard organitzat per categories, sense gestió manual
+**Current focus:** Planning next milestone (v1.1)
 
 ## Current Position
 
@@ -103,8 +103,9 @@ None yet.
 
 ### Blockers/Concerns
 
-- The Claude CLI token location (keychain vs config file) needs to be confirmed before implementing PROXY-01 — may require a quick spike
-- LaunchAgent path will differ between Mac mini and MacBook Air if home directories differ
+- 3 runtime behaviors pending human confirmation: (1) LaunchAgent persistence across login, (2) extension E2E with proxy running, (3) live tweet import pipeline with real Claude CLI session
+- `src/App.tsx.bak2` tracked in git — old backup artifact, candidate for cleanup
+- `proxy/test/proxy.test.mjs` incompatible with vitest runner — `npm test` exits 1 but 28/28 vitest tests pass
 
 ## Session Continuity
 
