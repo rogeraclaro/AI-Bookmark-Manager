@@ -61,13 +61,14 @@ Plans:
 - [ ] 03-01-PLAN.md — resolveSaveCategories helper (TDD) + wire handleSave() to callClaudeProxy + human verify
 
 ### Phase 4: Nyquist Validation
-**Goal:** Both Phase 1 and Phase 2 achieve Nyquist validation compliance
+**Goal:** Phases 1, 2, and 3 all achieve Nyquist validation compliance
 **Depends on:** Phase 3
 **Requirements:** (non-functional — process compliance)
-**Gap Closure:** Phase 1 VALIDATION.md fixed (nyquist_compliant: false -> true); Phase 2 VALIDATION.md created
+**Gap Closure:** Phase 1 VALIDATION.md fixed (nyquist_compliant: false -> true); Phase 2 and Phase 3 VALIDATION.md created
+**Plans**: 1 plan
 
 Plans:
-- [ ] 04-01-PLAN.md — Fix Phase 1 VALIDATION.md and create Phase 2 VALIDATION.md
+- [ ] 04-01-PLAN.md — Rewrite Phase 1 VALIDATION.md + create Phase 2 and Phase 3 VALIDATION.md files
 
 ### Phase 5: Tech Debt Cleanup
 **Goal:** Remove Gemini-era dead code and unused type dead code accumulated during migration
