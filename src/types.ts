@@ -29,7 +29,6 @@ export interface Bookmark {
 
 export type Category = string;
 
-// Gemini Service Types
 export interface ProcessedTweetResult {
   isAI: boolean;
   title: string;
