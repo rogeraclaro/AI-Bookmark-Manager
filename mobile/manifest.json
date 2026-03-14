@@ -1,0 +1,30 @@
+{
+  "name": "AI Bookmark Manager",
+  "short_name": "AI Bookmarks",
+  "description": "Guarda pàgines web a la teva col·lecció d'AI Bookmarks",
+  "start_url": "/mobile/",
+  "display": "standalone",
+  "background_color": "#facc15",
+  "theme_color": "#facc15",
+  "icons": [
+    {
+      "src": "/mobile/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/mobile/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "share_target": {
+    "action": "/mobile/",
+    "method": "GET",
+    "params": {
+      "url": "url",
+      "title": "title",
+      "text": "text"
+    }
+  }
+}
