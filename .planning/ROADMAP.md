@@ -74,10 +74,11 @@ Plans:
 **Goal:** Remove Gemini-era dead code and unused type dead code accumulated during migration
 **Depends on:** Phase 4
 **Requirements:** (non-functional — code hygiene)
-**Gap Closure:** TrialCountdown.tsx Gemini import removed; GET_BOOKMARKS dead type pruned from types.ts
+**Gap Closure:** TrialCountdown.tsx and geminiService.ts deleted; @google/genai uninstalled; misleading Gemini comment removed from types.ts
+**Plans**: 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md — Remove TrialCountdown Gemini import + GET_BOOKMARKS dead type
+- [ ] 05-01-PLAN.md — Delete geminiService.ts + TrialCountdown.tsx, uninstall @google/genai, clean types.ts comment, verify build
 
 ## Progress
 
