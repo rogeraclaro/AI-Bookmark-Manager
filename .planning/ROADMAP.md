@@ -80,10 +80,20 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Delete geminiService.ts + TrialCountdown.tsx, uninstall @google/genai, clean types.ts comment, verify build
 
+### Phase 6: Final Polish — Dead Code & Stale Strings
+**Goal:** Remove remaining dead code constants and stale UI strings accumulated during the Gemini→Claude migration
+**Depends on:** Phase 5
+**Requirements:** (non-functional — code hygiene)
+**Gap Closure:** Closes 4 tech debt items from v1.0 audit: GET_BOOKMARKS dead type, ERRORS.NO_CATEGORY dead string, stale "Gemini" UI string in App.tsx, src/package.json.bak deletion
+**Plans**: 1 plan
+
+Plans:
+- [ ] 06-01-PLAN.md — Remove GET_BOOKMARKS type + ERRORS.NO_CATEGORY constant + fix stale Gemini UI string + delete package.json.bak
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -92,3 +102,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Fix AI-03 — Wire Single-Save to Claude | 1/1 | Complete   | 2026-03-14 |
 | 4. Nyquist Validation | 1/1 | Complete   | 2026-03-14 |
 | 5. Tech Debt Cleanup | 1/1 | Complete   | 2026-03-14 |
+| 6. Final Polish — Dead Code & Stale Strings | 0/1 | Pending | — |
