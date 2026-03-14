@@ -54,16 +54,17 @@ Plans:
 **Goal:** Restore Claude categorization for the single-page save form in the extension (regression from Phase 2 commit 0352d1b)
 **Depends on:** Phase 2
 **Requirements:** AI-03
-**Gap Closure:** Closes AI-03 requirement gap, integration gap (handleSave → callClaudeProxy), and broken E2E flow "Extension single-page save with Claude categorization"
+**Gap Closure:** Closes AI-03 requirement gap, integration gap (handleSave -> callClaudeProxy), and broken E2E flow "Extension single-page save with Claude categorization"
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01-PLAN.md — Wire handleSave() in popup.tsx to call callClaudeProxy + apply categories + fallback
+- [ ] 03-01-PLAN.md — resolveSaveCategories helper (TDD) + wire handleSave() to callClaudeProxy + human verify
 
 ### Phase 4: Nyquist Validation
 **Goal:** Both Phase 1 and Phase 2 achieve Nyquist validation compliance
 **Depends on:** Phase 3
 **Requirements:** (non-functional — process compliance)
-**Gap Closure:** Phase 1 VALIDATION.md fixed (nyquist_compliant: false → true); Phase 2 VALIDATION.md created
+**Gap Closure:** Phase 1 VALIDATION.md fixed (nyquist_compliant: false -> true); Phase 2 VALIDATION.md created
 
 Plans:
 - [ ] 04-01-PLAN.md — Fix Phase 1 VALIDATION.md and create Phase 2 VALIDATION.md
@@ -80,7 +81,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
