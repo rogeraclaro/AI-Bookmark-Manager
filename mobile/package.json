@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "postbuild": "cp manifest.json dist/ && cp public/*.png dist/",
     "preview": "vite preview",
     "test": "vitest run --reporter=verbose"
   },
