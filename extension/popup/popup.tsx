@@ -14,6 +14,7 @@ import {
   GROUP_COLOR_MAP,
   buildTabBookmark,
   getTabSaveSummary,
+  resolveAuthorFromUrl,
 } from './tabsUtils';
 
 type ViewState = 'loading' | 'form' | 'duplicate' | 'success' | 'error' | 'tabs' | 'tabs-saving' | 'tabs-summary';
@@ -229,7 +230,7 @@ export default function Popup() {
         id: `ext_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         title: finalTitle,
         description: finalDescription,
-        author: metadata.author || 'Extension',
+        author: metadata.author || resolveAuthorFromUrl(metadata.url),
         originalLink: metadata.url,
         externalLinks: [],
         categories: finalCategories,
@@ -714,7 +715,7 @@ export default function Popup() {
         {/* Author (read-only) */}
         <div>
           <label className="block font-bold text-sm mb-1">👤 {UI_STRINGS.LABEL_AUTHOR}</label>
-          <p className="text-gray-500 text-sm font-mono">{metadata?.author || 'Extension'}</p>
+          <p className="text-gray-500 text-sm font-mono">{metadata?.author || (metadata?.url ? resolveAuthorFromUrl(metadata.url) : 'web')}</p>
         </div>
 
         {/* URL (read-only, truncated) */}
