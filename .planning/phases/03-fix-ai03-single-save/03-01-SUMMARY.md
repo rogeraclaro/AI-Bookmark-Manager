@@ -14,7 +14,7 @@ provides:
   - resolveSaveCategories pure helper with 3-tier fallback logic
   - handleSave() wired to Claude proxy for AI categorization on single-page saves
   - 6 unit tests covering all fallback tiers for resolveSaveCategories
-affects: [human-verify needed before AI-03 can be closed]
+affects: [04-fix-ai04-categories, 05-fix-ai05 — same popup.tsx handleSave pattern applies]
 
 # Tech tracking
 tech-stack:
@@ -35,6 +35,7 @@ key-decisions:
   - "Validation guard removed: selectedCategories.length === 0 no longer blocks save — Claude assigns categories"
   - "ERRORS.NO_CATEGORY left in config.ts (not deleted) — out-of-scope project-wide audit required first"
   - "Loading state reused for Claude call duration — simplest path per CONTEXT.md"
+  - "Author fallback resolves from URL hostname ('github', 'web') instead of hardcoded 'Extension' string — applied as Rule 1 fix during human verification"
 
 patterns-established:
   - "Pure category resolution helpers belong in *Utils.ts files, not inlined in popup"
@@ -53,11 +54,11 @@ completed: 2026-03-14
 
 ## Performance
 
-- **Duration:** ~5 min
+- **Duration:** ~30 min (including human verification)
 - **Started:** 2026-03-14T00:09:26Z
-- **Completed:** 2026-03-14T00:11:00Z
-- **Tasks:** 2 of 3 (Task 3 is checkpoint:human-verify — awaiting user)
-- **Files modified:** 3
+- **Completed:** 2026-03-14T00:11:47Z
+- **Tasks:** 3 of 3 (all complete, including human-verify checkpoint)
+- **Files modified:** 3 (+ additional fixes during verification)
 
 ## Accomplishments
 
@@ -66,6 +67,8 @@ completed: 2026-03-14
 - Removed the `selectedCategories.length === 0` validation guard from `handleSave()`
 - Inserted `callClaudeProxy` call and wired `finalTitle`, `finalDescription`, `finalCategories` into bookmark construction
 - Full test suite: 23/23 tests passing, TypeScript compiles cleanly
+- Human verification passed: save with no categories selected succeeds, Claude-generated categories appear on saved bookmarks
+- Additional fix: author field now resolves from URL hostname instead of hardcoded 'Extension' string
 
 ## Task Commits
 
@@ -73,7 +76,8 @@ Each task was committed atomically:
 
 1. **Task 1: Extract resolveSaveCategories helper + write tests** - `c37c91b` (feat)
 2. **Task 2: Wire handleSave() to callClaudeProxy** - `2985a94` (feat)
-3. **Task 3: Human verify** - awaiting checkpoint
+3. **Task 3: Human verify (checkpoint — approved)** - no code commit (human verification only)
+4. **Additional fix: author resolves from URL hostname** - `9db5852` + `15ad200` (fix — applied during verification)
 
 ## Files Created/Modified
 
@@ -89,11 +93,24 @@ Each task was committed atomically:
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
+
+**1. [Rule 1 - Bug] Author field hardcoded to 'Extension' string**
+- **Found during:** Task 3 (human verification)
+- **Issue:** Content script was hardcoding `author: 'Extension'` instead of deriving a meaningful value from the page URL, producing low-quality data on saved bookmarks
+- **Fix:** Author now resolves from URL hostname (e.g., 'github' for github.com, 'web' as generic fallback)
+- **Files modified:** extension content script / popup (see commits `9db5852`, `15ad200` for exact files)
+- **Verification:** Human confirmed during Task 3 end-to-end test
+- **Committed in:** `9db5852`, `15ad200` (separate fix commits applied during checkpoint)
+
+---
+
+**Total deviations:** 1 auto-fixed (Rule 1 — bug fix in author field resolution)
+**Impact on plan:** Fix improves bookmark data quality. No scope creep from core AI-03 objective.
 
 ## Issues Encountered
 
-None.
+None during planned tasks.
 
 ## User Setup Required
 
@@ -101,11 +118,9 @@ None - no external service configuration required.
 
 ## Next Phase Readiness
 
-- Code changes are complete and all unit tests pass
-- Awaiting human verification (Task 3 checkpoint) to confirm end-to-end behavior in the real extension:
-  - Save with no categories selected succeeds
-  - Saved bookmark has Claude-generated categories/title/description
-  - Proxy-down fallback preserves user's selected categories (or 'Altres')
+- AI-03 requirement is closed: single-page save now routes through Claude for categorization, matching the bulk-save path established in Phase 02
+- `resolveSaveCategories` in `singleSaveUtils.ts` is available for reuse in future phases
+- Any remaining AI-0x requirements (phases 4-5) can follow the same pattern: extract pure helper, write tests, wire to `callClaudeProxy`
 
 ---
 *Phase: 03-fix-ai03-single-save*
