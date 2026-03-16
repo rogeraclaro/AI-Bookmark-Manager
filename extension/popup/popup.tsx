@@ -38,10 +38,34 @@ export default function Popup() {
   const [tabSaveResults, setTabSaveResults] = useState<Map<number, { title: string; categories: string[] }>>(new Map());
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Load tabs on mount (tabs view is default)
+  // Load tabs on mount — restore single-page form if was active
   useEffect(() => {
-    loadTabsData();
+    chrome.storage.session.get(['singlePageMode', 'formState']).then(({ singlePageMode, formState }) => {
+      if (singlePageMode) {
+        if (formState) {
+          const fs = formState as { title: string; description: string; selectedCategories: string[]; metadata: ExtractedMetadata; categories: string[] };
+          setTitle(fs.title);
+          setDescription(fs.description);
+          setSelectedCategories(fs.selectedCategories);
+          setMetadata(fs.metadata);
+          setCategories(fs.categories);
+          setViewState('form');
+        } else {
+          loadData();
+        }
+      } else {
+        loadTabsData();
+      }
+    }).catch(() => loadTabsData());
   }, []);
+
+  // Save form state to session whenever it changes (so it survives tab switches)
+  useEffect(() => {
+    if (viewState !== 'form' || !metadata) return;
+    chrome.storage.session.set({
+      formState: { title, description, selectedCategories, metadata, categories }
+    });
+  }, [title, description, selectedCategories, viewState, metadata, categories]);
 
   async function loadTabsData() {
     try {
@@ -119,14 +143,34 @@ export default function Popup() {
       setTitle(extractedMetadata.title);
       setDescription(extractedMetadata.description);
 
-      // Get categories from background
-      const categoriesResponse = await chrome.runtime.sendMessage({ type: 'GET_CATEGORIES' });
+      // Check duplicate + fetch categories in parallel (both are fast API calls)
+      const [duplicateResponse, categoriesResponse] = await Promise.all([
+        chrome.runtime.sendMessage({ type: 'CHECK_DUPLICATE', data: { url: extractedMetadata.url } }),
+        chrome.runtime.sendMessage({ type: 'GET_CATEGORIES' }),
+      ]);
 
-      if (categoriesResponse.success) {
-        setCategories(categoriesResponse.data);
-      } else {
-        setCategories(['Altres']);
+      if (duplicateResponse.success && duplicateResponse.data.isDuplicate) {
+        setViewState('duplicate');
+        return;
       }
+
+      const resolvedCats: string[] = categoriesResponse.success ? categoriesResponse.data : ['Altres'];
+      setCategories(resolvedCats);
+
+      // Call Claude for AI-suggested categories (never throws — returns { categories: [] } on failure)
+      const aiResult = await callClaudeProxy({
+        url: extractedMetadata.url,
+        title: extractedMetadata.title,
+        description: extractedMetadata.description,
+        categories: resolvedCats,
+      });
+
+      const valid = aiResult.categories.filter(c => resolvedCats.includes(c));
+      if (valid.length > 0) {
+        setSelectedCategories(valid);
+      }
+      if (aiResult.title) setTitle(aiResult.title);
+      if (aiResult.description) setDescription(aiResult.description);
 
       setViewState('form');
     } catch (err) {
@@ -213,17 +257,9 @@ export default function Popup() {
         return;
       }
 
-      // Call Claude proxy for AI categorization (always resolves — proxy failure is silent)
-      const aiResult = await callClaudeProxy({
-        url: metadata.url,
-        title,
-        description,
-        categories,
-      });
-
-      const finalCategories = resolveSaveCategories(aiResult.categories, categories, selectedCategories);
-      const finalTitle = aiResult.title || title.trim();
-      const finalDescription = aiResult.description || description.trim();
+      const finalCategories = resolveSaveCategories([], categories, selectedCategories);
+      const finalTitle = title.trim();
+      const finalDescription = description.trim();
 
       // Create bookmark object
       const bookmark: Bookmark = {
@@ -247,6 +283,7 @@ export default function Popup() {
         throw new Error(saveResponse.error || ERRORS.API_ERROR);
       }
 
+      chrome.storage.session.remove(['singlePageMode', 'formState']);
       setViewState('success');
 
       // Auto-close after 1 second
@@ -262,6 +299,7 @@ export default function Popup() {
   }
 
   function handleCancel() {
+    chrome.storage.session.remove(['singlePageMode', 'formState']);
     window.close();
   }
 
@@ -435,7 +473,7 @@ export default function Popup() {
           <h1 className="text-lg font-bold uppercase">🔖 {UI_STRINGS.TABS_HEADING}</h1>
           <button
             className="text-xs underline font-mono hover:no-underline"
-            onClick={() => { loadData(); setViewState('loading'); }}
+            onClick={() => { chrome.storage.session.set({ singlePageMode: true }); loadData(); setViewState('loading'); }}
           >
             {UI_STRINGS.TABS_SAVE_THIS_PAGE}
           </button>
