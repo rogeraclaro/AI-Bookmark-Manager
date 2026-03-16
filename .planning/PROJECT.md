@@ -37,6 +37,7 @@ L'usuari pot capturar qualsevol contingut web (pàgines, tabs obertes, tweets) i
 - [ ] Indicador visual a la UI quan el proxy local no és accessible (V2-01)
 - [ ] Re-categorització manual d'un bookmark existent via Claude (V2-02)
 - [ ] Suport per a models Claude configurables (Haiku / Sonnet) des de la UI (V2-03)
+- [ ] Vista de revisió AI pre-guardat per al bulk-save de tabs + persistència de l'estat del popup (V2-04) — implementat a `universal-bookmarks` (Phase 2). Inclou: pas `tabs-review` on l'usuari edita categories AI abans de confirmar, `restoreOrLoad` amb `chrome.storage.local` per restaurar l'estat si el popup es tanca en mig d'una revisió. Referència: `.planning/phases/02-chrome-tabs-feature/` a universal-bookmarks.
 
 ### Out of Scope
 

@@ -34,8 +34,11 @@ const categorizeSchema = {
   type: 'object',
   properties: {
     categories: { type: 'array', items: { type: 'string' } },
+    title: { type: 'string', maxLength: 80 },
+    description: { type: 'string', maxLength: 300 },
   },
   required: ['categories'],
+  additionalProperties: false,
 };
 
 // Richer schema for tweets: extracts a clean title + description + categories
@@ -148,18 +151,25 @@ Títol del tab: ${title}${tweetBody}
           categories: result?.categories || [],
         });
       } else {
-        // Regular page: categorize only
-        const prompt = `Ets un assistent de categorització en català. Assigna categories adequades a aquest bookmark.
+        // Regular page: categorize + generate clean title and description
+        const prompt = `Categoritza aquest bookmark i retorna categories, un títol net i una descripció curta — tot en català.
 ${categoriesStr}
-Retorna un array de màxim 2 categories NOMÉS de la llista vàlida.
-IMPORTANT: El contingut pot estar en qualsevol idioma — fes correspondència semàntica amb les categories en català.
-Usa "Altres" NOMÉS si cap categoria de la llista encaixa mínimament.
 
 URL: ${url}
 Títol: ${title}
-Descripció: ${description || ''}`;
+Contingut de la pàgina: ${description || '(no disponible)'}
+
+Regles:
+- categories: tria 1-2 de la llista vàlida, usa "Altres" NOMÉS com a últim recurs
+- title: neteja el títol de la pàgina (màx 80 cars), mantén-lo en l'idioma original si és un nom propi
+- description: 2-3 frases resumint de què tracta la pàgina, en català, basat en el contingut
+IMPORTANT: El contingut pot estar en qualsevol idioma — fes correspondència semàntica amb les categories en català.`;
         const result = await callClaude(prompt, categorizeSchema);
-        res.json({ categories: result?.categories || [] });
+        res.json({
+          categories: result?.categories || [],
+          title: result?.title || '',
+          description: result?.description || '',
+        });
       }
     } catch (err) {
       console.error('[proxy] /categorize failed after', Date.now() - t0, 'ms — code:', err.code, 'signal:', err.signal, 'killed:', err.killed, '\nstdout:', err.stdout?.slice(0, 500), '\nstderr:', err.stderr);

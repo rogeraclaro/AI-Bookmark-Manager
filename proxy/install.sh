@@ -2,7 +2,7 @@
 set -e
 
 PROXY_DIR="$(cd "$(dirname "$0")" && pwd)"
-PLIST_NAME="com.ailinks.claude-proxy"
+PLIST_NAME="com.ailinks.ailinks-proxy"
 PLIST_SRC="$PROXY_DIR/$PLIST_NAME.plist"
 PLIST_DEST="$HOME/Library/LaunchAgents/$PLIST_NAME.plist"
 LOGS_DIR="$HOME/Library/Logs"
@@ -34,11 +34,9 @@ echo "Plist written to: $PLIST_DEST"
 launchctl unload "$PLIST_DEST" 2>/dev/null || true
 
 # Load the LaunchAgent
-# Note: launchctl load is deprecated on macOS 12+ but still works for user agents.
-# Alternative: launchctl bootstrap gui/$(id -u) "$PLIST_DEST"
 launchctl load "$PLIST_DEST"
 
-echo "Claude proxy LaunchAgent installed and started."
-echo "Logs: $LOGS_DIR/claude-proxy.log"
+echo "ai-bookmarks proxy LaunchAgent installed and started (port 3838)."
+echo "Logs: $LOGS_DIR/ailinks-proxy.log"
 echo "To check status: launchctl list | grep ailinks"
 echo "To stop: launchctl unload $PLIST_DEST"
