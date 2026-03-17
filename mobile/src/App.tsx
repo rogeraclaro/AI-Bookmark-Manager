@@ -120,7 +120,7 @@ export default function App() {
   if (viewState === 'success') {
     return (
       <div className="p-6">
-        <div className="bg-yellow-400 border-2 border-black p-4 text-black">
+        <div className="bg-green-400 border-2 border-black p-4 text-black">
           <h1 className="text-xl font-bold uppercase">✅ {UI_STRINGS.SUCCESS}</h1>
         </div>
       </div>
