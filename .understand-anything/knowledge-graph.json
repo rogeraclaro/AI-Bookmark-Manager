@@ -1,4 +1,22 @@
 {
+  "version": "1.0.0",
+  "project": {
+    "name": "ai-bookmarks",
+    "languages": [
+      "typescript",
+      "javascript",
+      "bash"
+    ],
+    "frameworks": [
+      "React",
+      "Vite",
+      "Vitest",
+      "Tailwind CSS"
+    ],
+    "description": "AI Bookmark Manager is a web application that allows managing and organizing bookmarks exported from Twitter (X), using Google Gemini AI to automatically analyze, categorize, and title AI-related tweets in Catalan.",
+    "analyzedAt": "2026-03-22T11:38:26.418792+00:00",
+    "gitCommitHash": "c2a593c82ed1c0b5a1a914b83a0ef0caff307781"
+  },
   "nodes": [
     {
       "id": "file:deploy-to-vps.sh",
@@ -1034,7 +1052,7 @@
         "ui",
         "crud"
       ],
-      "complexity": "very complex"
+      "complexity": "complex"
     },
     {
       "id": "func:src/App.tsx:App",
@@ -1048,7 +1066,7 @@
         "root",
         "state-management"
       ],
-      "complexity": "very complex"
+      "complexity": "complex"
     },
     {
       "id": "func:src/App.tsx:BookmarkCard",
@@ -2225,6 +2243,227 @@
       "type": "contains",
       "direction": "forward",
       "weight": 1.0
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:web-app",
+      "name": "Web App Layer",
+      "description": "Main React web application for bookmark management. Includes the full-featured UI (import, AI categorization, filtering, search, sync), UI primitive components, service clients for AI and storage, i18n translations, and core type definitions.",
+      "nodeIds": [
+        "file:src/App.tsx",
+        "file:src/main.tsx",
+        "file:src/components/ScrollToTop.tsx",
+        "file:src/components/UI.tsx",
+        "file:src/services/claudeService.ts",
+        "file:src/services/claudeService.test.ts",
+        "file:src/services/storage.ts",
+        "file:src/translations.ts",
+        "file:src/types.ts",
+        "file:src/vite-env.d.ts",
+        "file:src/vite.config.ts"
+      ]
+    },
+    {
+      "id": "layer:chrome-extension",
+      "name": "Chrome Extension Layer",
+      "description": "Chrome browser extension with popup UI, background service worker, content script, shared API client, shared type definitions, and build artifacts. Enables saving bookmarks directly from the browser. Includes source files, compiled artifacts, and extension-specific configuration.",
+      "nodeIds": [
+        "file:extension/popup/index.tsx",
+        "file:extension/popup/popup.tsx",
+        "file:extension/popup/singleSaveUtils.ts",
+        "file:extension/popup/tabsUtils.ts",
+        "file:extension/background/service-worker.ts",
+        "file:extension/background/service-worker.js",
+        "file:extension/content/content.ts",
+        "file:extension/content/content.js",
+        "file:extension/shared/api.ts",
+        "file:extension/shared/config.ts",
+        "file:extension/shared/types.ts",
+        "file:extension/assets/api-DyDpKlVl.js",
+        "file:extension/assets/popup-DbKNwE_q.js",
+        "file:extension/tests/single-save.test.ts",
+        "file:extension/tests/tabs-filter.test.ts",
+        "file:extension/tests/tabs-save.test.ts",
+        "file:extension/tests/tabs-selection.test.ts",
+        "file:extension/postcss.config.js",
+        "file:extension/tailwind.config.js",
+        "file:extension/vite.config.ts",
+        "file:extension/vitest.config.ts"
+      ]
+    },
+    {
+      "id": "layer:mobile-pwa",
+      "name": "Mobile PWA Layer",
+      "description": "Mobile Progressive Web App enabling bookmark saving via the native Web Share Target API. Includes the main React component, PWA service worker for offline support, URL/share-parameter utilities, configuration, and deployment script.",
+      "nodeIds": [
+        "file:mobile/src/App.tsx",
+        "file:mobile/src/main.tsx",
+        "file:mobile/src/api.ts",
+        "file:mobile/src/config.ts",
+        "file:mobile/src/utils.ts",
+        "file:mobile/src/utils.test.ts",
+        "file:mobile/public/sw.js",
+        "file:mobile/deploy.sh",
+        "file:mobile/postcss.config.js",
+        "file:mobile/tailwind.config.js",
+        "file:mobile/vite.config.ts"
+      ]
+    },
+    {
+      "id": "layer:proxy-backend",
+      "name": "Proxy Backend Layer",
+      "description": "Local Express.js proxy server that bridges the browser app to the Claude CLI. Exposes REST endpoints for AI categorization requests and streams responses. Includes installation scripts and test utilities for the proxy.",
+      "nodeIds": [
+        "file:proxy/server.js",
+        "file:proxy/install.sh",
+        "file:proxy/test/mock-claude.sh",
+        "file:proxy/test/test-install.sh"
+      ]
+    },
+    {
+      "id": "layer:infrastructure",
+      "name": "Infrastructure & Config Layer",
+      "description": "Root-level configuration, tooling, and utility scripts for the monorepo. Includes deployment scripts, ESLint config, PostCSS/Tailwind/Vite configs for the main app, and the Twitter bookmark batch-splitting utility.",
+      "nodeIds": [
+        "file:deploy-to-vps.sh",
+        "file:eslint.config.js",
+        "file:postcss.config.js",
+        "file:tailwind.config.js",
+        "file:vite.config.ts",
+        "file:split-tweets.sh"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Web App Entry Point",
+      "description": "Start here: src/main.tsx is the minimal React bootstrapping file that mounts the entire web application into the DOM. It has zero incoming dependencies (fan-in: 0), making it the true root of the web app's dependency graph. Understanding this file sets the stage for everything else \u2014 it delegates all real work to App.tsx immediately.",
+      "nodeIds": [
+        "file:src/main.tsx"
+      ],
+      "languageLesson": "React entry points typically call ReactDOM.createRoot().render() with a single root component. The simplicity is intentional \u2014 this file's only job is to start the engine."
+    },
+    {
+      "order": 2,
+      "title": "The Core Domain Model",
+      "description": "Before diving into the main component, understand the data shapes that flow through the entire system. src/types.ts defines the three foundational types \u2014 Bookmark, Category, and BookmarkGroup \u2014 and is imported by App.tsx, the storage service, and the Claude service (fan-in: 3). Knowing these types makes every other file immediately legible.",
+      "nodeIds": [
+        "file:src/types.ts"
+      ],
+      "languageLesson": "In TypeScript, co-locating core domain types in a dedicated file prevents circular imports and creates a stable contract that all other modules can depend on without depending on each other."
+    },
+    {
+      "order": 3,
+      "title": "The Main Web App Component",
+      "description": "App.tsx is the highest fan-out node in the entire codebase (fan-out: 6), orchestrating all features of the bookmark manager: importing tweets, AI categorization via Google Gemini, filtering, duplicate detection, VPS sync, and export. At 1909 lines it is the largest file; it is the central hub that connects every service, UI component, and utility in the web layer. All roads from main.tsx lead here.",
+      "nodeIds": [
+        "file:src/App.tsx"
+      ],
+      "languageLesson": "A high fan-out component like this is an orchestrator pattern \u2014 it wires subsystems together rather than implementing logic itself. The tradeoff is that it becomes a complexity hotspot requiring careful state management."
+    },
+    {
+      "order": 4,
+      "title": "UI Primitive Design System",
+      "description": "App.tsx delegates all visual rendering to two UI files. src/components/UI.tsx exports 7 primitive components \u2014 Badge, Button, Card, Input, Modal, Select, Tooltip \u2014 forming the design system foundation. src/components/ScrollToTop.tsx is a small utility component. Both are pure presentational leaves with no outgoing dependencies, making them safe to study and modify in isolation.",
+      "nodeIds": [
+        "file:src/components/UI.tsx",
+        "file:src/components/ScrollToTop.tsx"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "i18n Translations Layer",
+      "description": "src/translations.ts holds all user-facing string constants for Catalan and Spanish, and is consumed by both App.tsx and the storage service (fan-in: 2). This separation means the UI is never hardcoded in English \u2014 a deliberate design choice for a Catalan-language-first application. It is a leaf node with no outgoing imports.",
+      "nodeIds": [
+        "file:src/translations.ts"
+      ],
+      "languageLesson": "Keeping translation strings in a dedicated constants file (rather than inline JSX) makes it trivial to add new locales and keeps components free of language-specific logic."
+    },
+    {
+      "order": 6,
+      "title": "Persistence: Storage Service",
+      "description": "src/services/storage.ts manages where bookmarks and categories actually live: a VPS API with local browser storage as fallback. It imports both src/types.ts (for data shapes) and src/translations.ts (for error messages surfaced to users). Understanding this service explains how the app survives network failures gracefully.",
+      "nodeIds": [
+        "file:src/services/storage.ts"
+      ]
+    },
+    {
+      "order": 7,
+      "title": "AI Integration: Claude Service",
+      "description": "src/services/claudeService.ts is the web app's bridge to local AI. It communicates with the Claude CLI proxy (covered later) to perform bookmark categorization. It consumes src/types.ts for the Bookmark shape and has its own test file (claudeService.test.ts), making it the most rigorously tested module in the web layer. This is the core AI capability of the whole system.",
+      "nodeIds": [
+        "file:src/services/claudeService.ts",
+        "file:src/services/claudeService.test.ts"
+      ]
+    },
+    {
+      "order": 8,
+      "title": "The AI Proxy Backend",
+      "description": "proxy/server.js is a standalone Express.js server that acts as the bridge between browser-based JavaScript (which cannot spawn CLI processes) and the local Claude CLI binary. It exposes /api/claude and /api/claude/stream endpoints. The claudeService.ts from the previous step calls this proxy. This file is architecturally isolated \u2014 zero fan-in and zero fan-out in the graph \u2014 meaning it is a self-contained backend.",
+      "nodeIds": [
+        "file:proxy/server.js"
+      ],
+      "languageLesson": "Browser security restrictions (CORS, process spawning) necessitate a local proxy pattern. The proxy is intentionally minimal: it does one thing (spawn claude CLI and stream output) and does it well."
+    },
+    {
+      "order": 9,
+      "title": "Chrome Extension: Shared Foundation",
+      "description": "The Chrome extension is a separate sub-application that shares data contracts with the mobile PWA. Its foundation is two files: extension/shared/types.ts (fan-in: 5 \u2014 the most depended-upon file in the entire codebase) defines Bookmark, Category, and SaveBookmarkRequest; extension/shared/config.ts holds API endpoint constants. These shared files are depended on by the popup, service worker, content script, and even the mobile app.",
+      "nodeIds": [
+        "file:extension/shared/types.ts",
+        "file:extension/shared/config.ts"
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Chrome Extension: Shared API Client",
+      "description": "extension/shared/api.ts (fan-in: 3) is the HTTP client shared across the extension popup, service worker, and mobile PWA. It provides async functions for fetching/saving bookmarks and categories, plus the Claude AI proxy call. Its position as a hub between three different consumers \u2014 and as the module that mobile/src/api.ts re-exports verbatim \u2014 makes it the glue between all client surfaces.",
+      "nodeIds": [
+        "file:extension/shared/api.ts"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "Chrome Extension: Service Worker & Content Script",
+      "description": "The extension's background process is extension/background/service-worker.ts, which handles Chrome message-passing (CHECK_DUPLICATE, SAVE_BOOKMARK, ADD_CATEGORY, GET_CATEGORIES) and maintains a category cache. Separately, extension/content/content.ts is injected directly into Twitter/X pages to extract bookmark data from the DOM. Together these two files form the invisible backend of the extension, running outside any visible UI.",
+      "nodeIds": [
+        "file:extension/background/service-worker.ts",
+        "file:extension/content/content.ts"
+      ],
+      "languageLesson": "Chrome extensions have three isolated JavaScript contexts: content scripts (page DOM access), service workers (background persistence), and the popup (UI). They communicate exclusively via Chrome's message-passing API \u2014 they cannot share memory."
+    },
+    {
+      "order": 12,
+      "title": "Chrome Extension: Popup UI",
+      "description": "extension/popup/index.tsx is the extension popup's entry point, mirroring the role of src/main.tsx for the web app. It mounts extension/popup/popup.tsx, the 823-line popup component that manages the full bookmark-saving flow: single-page save, multi-tab batch save, category selection, and duplicate detection. The popup delegates save logic to singleSaveUtils.ts and tabsUtils.ts to keep its component code focused on UI state.",
+      "nodeIds": [
+        "file:extension/popup/index.tsx",
+        "file:extension/popup/popup.tsx",
+        "file:extension/popup/singleSaveUtils.ts",
+        "file:extension/popup/tabsUtils.ts"
+      ]
+    },
+    {
+      "order": 13,
+      "title": "Mobile PWA Entry & App",
+      "description": "The mobile Progressive Web App is the third client surface. mobile/src/main.tsx bootstraps the React root (same pattern as the web app), mounting mobile/src/App.tsx which implements the Web Share Target flow \u2014 when a user shares a Twitter/X URL from their phone's browser, the OS routes it here. The mobile app then displays bookmarks and submits to the same VPS API used by the web app.",
+      "nodeIds": [
+        "file:mobile/src/main.tsx",
+        "file:mobile/src/App.tsx"
+      ]
+    },
+    {
+      "order": 14,
+      "title": "Mobile PWA: Code Reuse via Barrel Re-export",
+      "description": "mobile/src/api.ts is a single-line barrel file that re-exports everything from extension/shared/api.ts. This is the architecture's most important code-reuse decision: rather than duplicating the HTTP client, the mobile app transparently delegates to the extension's shared API layer. mobile/src/config.ts and mobile/src/utils.ts provide mobile-specific configuration and utility functions to complete the mobile layer.",
+      "nodeIds": [
+        "file:mobile/src/api.ts",
+        "file:mobile/src/config.ts",
+        "file:mobile/src/utils.ts"
+      ],
+      "languageLesson": "A barrel re-export (`export * from '../other/module'`) lets two sub-applications share implementation without coupling their internal paths. The mobile app can evolve its import paths independently of the extension's internals."
     }
   ]
 }
