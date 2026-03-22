@@ -39,8 +39,7 @@ const BookmarkCard: React.FC<{
 
 	return (
 		<div
-			className='border-2 border-black p-5 h-full flex flex-col shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-200'
-			style={{ backgroundColor: bookmark.highlighted ? 'rgba(250, 204, 21, 0.5)' : 'white' }}
+			className={`border-2 border-black p-5 h-full flex flex-col shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ${bookmark.highlighted ? 'bg-yellow-400/50' : 'bg-white'}`}
 		>
 			<div className='flex justify-between items-start mb-2'>
 				<div className='flex flex-wrap gap-1.5'>
@@ -203,7 +202,6 @@ export default function App() {
 	// Search Modal State
 	const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
 	const [searchQuery, setSearchQuery] = useState('')
-	const [searchResults, setSearchResults] = useState<Bookmark[]>([])
 
 	// Custom Delete Modal State
 	const [deleteModalState, setDeleteModalState] = useState<{
@@ -271,15 +269,6 @@ export default function App() {
 				const searchParam = urlParams.get('search')
 				if (searchParam) {
 					setSearchQuery(searchParam)
-					// Perform search with loaded bookmarks
-					const lowerQuery = searchParam.toLowerCase().trim()
-					const results = loadedBookmarks.filter((bookmark) => {
-						const titleMatch = bookmark.title.toLowerCase().includes(lowerQuery)
-						const descriptionMatch = bookmark.description.toLowerCase().includes(lowerQuery)
-						const authorMatch = bookmark.author.toLowerCase().includes(lowerQuery)
-						return titleMatch || descriptionMatch || authorMatch
-					})
-					setSearchResults(results)
 				}
 			} catch (error) {
 				console.error('Failed to load data', error)
@@ -942,30 +931,31 @@ export default function App() {
 
 	// Search Function
 	const handleSearch = (query: string) => {
-		if (!query.trim()) {
-			setSearchResults([])
-			return
-		}
-
-		const lowerQuery = query.toLowerCase().trim()
-		const results = bookmarks.filter((bookmark) => {
-			const titleMatch = bookmark.title.toLowerCase().includes(lowerQuery)
-			const descriptionMatch = bookmark.description.toLowerCase().includes(lowerQuery)
-			const authorMatch = bookmark.author.toLowerCase().includes(lowerQuery)
-
-			return titleMatch || descriptionMatch || authorMatch
-		})
-
-		setSearchResults(results)
+		setSearchQuery(query)
 
 		// Update URL with search param
 		const url = new URL(window.location.href)
-		url.searchParams.set('search', query)
+		if (query.trim()) {
+			url.searchParams.set('search', query)
+		} else {
+			url.searchParams.delete('search')
+		}
 		window.history.pushState({}, '', url)
 
 		// Close search modal
 		setIsSearchModalOpen(false)
 	}
+
+	const searchResults = useMemo(() => {
+		if (!searchQuery.trim()) return []
+		const lowerQuery = searchQuery.toLowerCase().trim()
+		return bookmarks.filter((bookmark) => {
+			const titleMatch = bookmark.title.toLowerCase().includes(lowerQuery)
+			const descriptionMatch = bookmark.description.toLowerCase().includes(lowerQuery)
+			const authorMatch = bookmark.author.toLowerCase().includes(lowerQuery)
+			return titleMatch || descriptionMatch || authorMatch
+		})
+	}, [bookmarks, searchQuery])
 
 	const handleToggleHighlight = (id: string) => {
 		setBookmarks((prev) =>
@@ -1255,7 +1245,6 @@ export default function App() {
 							<button
 								onClick={() => {
 									setSearchQuery('')
-									setSearchResults([])
 									window.history.pushState({}, '', window.location.pathname)
 								}}
 								className='font-mono font-bold text-sm px-4 py-2 border-2 border-black bg-white hover:bg-gray-100 transition-colors shadow-[2px_2px_0px_0px_#000]'

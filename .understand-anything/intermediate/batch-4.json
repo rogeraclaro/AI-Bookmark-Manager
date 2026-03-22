@@ -1,0 +1,350 @@
+{
+  "nodes": [
+    {
+      "id": "file:proxy/server.js",
+      "type": "file",
+      "name": "server.js",
+      "filePath": "proxy/server.js",
+      "summary": "Express.js proxy server that bridges the React app to the Claude AI CLI. Exposes two POST endpoints: /categorize (handles both tweet URLs and regular pages, generating title/description/categories via Claude) and /process-tweet (processes raw tweet objects into structured bookmark data). Uses child_process.spawn to invoke the claude CLI with JSON schema-constrained output. Designed for testability: createApp factory separates construction from port binding, and getChildEnv strips Claude Code session variables to allow nested invocation.",
+      "tags": ["proxy", "express", "claude-ai", "api", "backend", "subprocess", "categorization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:proxy/server.js:getChildEnv",
+      "type": "function",
+      "name": "getChildEnv",
+      "filePath": "proxy/server.js",
+      "summary": "Strips CLAUDECODE and CLAUDE_CODE_ENTRYPOINT env vars from the process environment so the claude CLI can be spawned from within a Claude Code session. Accepts an optional envObject for testability.",
+      "tags": ["environment", "utility", "testable"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:proxy/server.js:createApp",
+      "type": "function",
+      "name": "createApp",
+      "filePath": "proxy/server.js",
+      "summary": "Factory function that creates and configures the Express application. Contains the internal callClaude helper (spawns claude CLI subprocess with timeout handling) and registers /categorize and /process-tweet routes. Accepts claudeBin and claudeTimeout for testability.",
+      "tags": ["factory", "express", "route-registration", "testable"],
+      "complexity": "complex"
+    },
+    {
+      "id": "func:proxy/server.js:sanitizeText",
+      "type": "function",
+      "name": "sanitizeText",
+      "filePath": "proxy/server.js",
+      "summary": "Sanitizes tweet text by stripping hashtags, mentions, control characters, and normalizing whitespace. Truncates to 700 characters. Ported from geminiService.ts.",
+      "tags": ["utility", "text-processing", "sanitization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:proxy/test/mock-claude.sh",
+      "type": "file",
+      "name": "mock-claude.sh",
+      "filePath": "proxy/test/mock-claude.sh",
+      "summary": "Minimal bash mock of the claude CLI binary used in proxy tests. Inspects argument string to decide which JSON response shape to echo: categorization response or tweet processing response. Avoids spawning the real Claude CLI during automated tests.",
+      "tags": ["test", "mock", "bash", "cli"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:proxy/test/test-install.sh",
+      "type": "file",
+      "name": "test-install.sh",
+      "filePath": "proxy/test/test-install.sh",
+      "summary": "Bash test script that validates the launchd plist template (com.ailinks.claude-proxy.plist) by substituting __HOME__ and __PROXY_DIR__ placeholders and verifying no placeholders remain and the actual HOME path is present. Exits with SKIP if the plist template does not yet exist.",
+      "tags": ["test", "bash", "install", "plist", "macos"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:split-tweets.sh",
+      "type": "file",
+      "name": "split-tweets.sh",
+      "filePath": "split-tweets.sh",
+      "summary": "Bash utility that splits a large Twitter bookmark JSON file into batches of 10 tweets, sorted chronologically (oldest first). Uses an embedded Python 3 script for JSON parsing and date handling. Supports both Unix timestamp and Twitter date string formats. Creates a named output directory with zero-padded numbered JSON files.",
+      "tags": ["utility", "bash", "python", "twitter", "batch-processing", "json"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/App.tsx",
+      "type": "file",
+      "name": "App.tsx",
+      "filePath": "src/App.tsx",
+      "summary": "The central React component of the AI Bookmark Manager (1909 lines). Manages the full application lifecycle: importing Twitter JSON archives, processing tweets through the Claude proxy, deduplication/blacklist logic, category management with drag-and-drop reordering, bookmark CRUD (create/edit/delete), highlight toggling, search with URL sync, data persistence via storage service, JSON export/backup, and a multi-step review carousel for non-AI tweets. Also defines the BookmarkCard sub-component for rendering individual bookmarks with neobrutalist styling.",
+      "tags": ["react", "main-component", "state-management", "bookmarks", "twitter", "claude-ai", "ui", "crud"],
+      "complexity": "very complex"
+    },
+    {
+      "id": "func:src/App.tsx:App",
+      "type": "function",
+      "name": "App",
+      "filePath": "src/App.tsx",
+      "summary": "Default export. Root React component orchestrating all application state (20+ useState/useRef hooks), effects for data loading and persistence, and rendering the full UI including header, sidebar navigation, category sections, modals, search, and review carousel.",
+      "tags": ["react", "component", "root", "state-management"],
+      "complexity": "very complex"
+    },
+    {
+      "id": "func:src/App.tsx:BookmarkCard",
+      "type": "function",
+      "name": "BookmarkCard",
+      "filePath": "src/App.tsx",
+      "summary": "React functional component rendering a single bookmark card with neobrutalist styling. Displays categories as badges, author/date metadata, title, description, external links, and action buttons for edit, delete, and highlight toggle.",
+      "tags": ["react", "component", "ui", "bookmark"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/App.tsx:processTweetsData",
+      "type": "function",
+      "name": "processTweetsData",
+      "filePath": "src/App.tsx",
+      "summary": "Core async function that deduplicates tweets against existing bookmarks and blacklist, calls processBookmarksWithClaude for AI processing, maps AI results to Bookmark objects (extracting author, date, description, external links), and triggers the review modal for non-AI tweets.",
+      "tags": ["async", "tweet-processing", "claude-ai", "deduplication"],
+      "complexity": "complex"
+    },
+    {
+      "id": "func:src/App.tsx:handleFileUpload",
+      "type": "function",
+      "name": "handleFileUpload",
+      "filePath": "src/App.tsx",
+      "summary": "Handles JSON file input: detects whether the file is a backup (merges categories/bookmarks/deletedIds) or a Twitter archive (extracts tweet array and calls processTweetsData). Uses FileReader API with AbortController for cancellation.",
+      "tags": ["file-upload", "json-parse", "backup-restore", "twitter-archive"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/App.tsx:groupedBookmarks",
+      "type": "function",
+      "name": "groupedBookmarks",
+      "filePath": "src/App.tsx",
+      "summary": "useMemo computation that groups bookmarks by all their categories (a bookmark can appear in multiple groups), sorts each group newest-first, and ensures uncategorized bookmarks fall into the default group.",
+      "tags": ["memo", "grouping", "sorting"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/ScrollToTop.tsx",
+      "type": "file",
+      "name": "ScrollToTop.tsx",
+      "filePath": "src/components/ScrollToTop.tsx",
+      "summary": "React component that renders a fixed-position scroll-to-top button (neobrutalist yellow with ArrowUp icon). Becomes visible when the user scrolls more than 400px down, using a scroll event listener attached/detached via useEffect.",
+      "tags": ["react", "component", "ui", "accessibility", "scroll"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/components/ScrollToTop.tsx:ScrollToTop",
+      "type": "function",
+      "name": "ScrollToTop",
+      "filePath": "src/components/ScrollToTop.tsx",
+      "summary": "Exported React FC that tracks scroll position and conditionally renders a smooth-scroll-to-top button.",
+      "tags": ["react", "component", "exported"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/UI.tsx",
+      "type": "file",
+      "name": "UI.tsx",
+      "filePath": "src/components/UI.tsx",
+      "summary": "Design system primitives for the neobrutalist UI. Exports: Button (4 variants: primary/secondary/danger/ghost with shadow/active effects), Card (bordered container with optional title), Input, TextArea, Label, Select (with custom SVG chevron), Badge (colored pill), and Modal (backdrop + z-index priority support). All components use Tailwind CSS utility classes.",
+      "tags": ["react", "component", "design-system", "ui", "tailwind", "neobrutalist"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main.tsx",
+      "type": "file",
+      "name": "main.tsx",
+      "filePath": "src/main.tsx",
+      "summary": "React application entry point. Mounts the App component inside React.StrictMode onto the DOM element with id='root'. Throws an error if the root element is not found.",
+      "tags": ["react", "entry-point", "bootstrap"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/services/claudeService.test.ts",
+      "type": "file",
+      "name": "claudeService.test.ts",
+      "filePath": "src/services/claudeService.test.ts",
+      "summary": "Vitest test suite for claudeService.ts covering: module export shape verification, successful proxy response mapping to ProcessedTweetResult[], fallback bookmark creation when proxy is unreachable (fetch failure), and AbortError propagation when AbortSignal is pre-aborted. Uses vi.stubGlobal to mock fetch and importMeta.env.",
+      "tags": ["test", "vitest", "claude-service", "mock", "abort"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:proxy/server.js",
+      "target": "func:proxy/server.js:getChildEnv",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:proxy/server.js",
+      "target": "func:proxy/server.js:createApp",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:proxy/server.js",
+      "target": "func:proxy/server.js:sanitizeText",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "func:src/App.tsx:App",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "func:src/App.tsx:BookmarkCard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "func:src/App.tsx:processTweetsData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "func:src/App.tsx:handleFileUpload",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "func:src/App.tsx:groupedBookmarks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/ScrollToTop.tsx",
+      "target": "func:src/components/ScrollToTop.tsx:ScrollToTop",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/services/claudeService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/services/storage.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/components/UI.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/components/ScrollToTop.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/translations.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/main.tsx",
+      "target": "file:src/App.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/claudeService.test.ts",
+      "target": "file:src/services/claudeService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/claudeService.test.ts",
+      "target": "file:src/services/claudeService.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "func:src/App.tsx:processTweetsData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "func:src/App.tsx:App",
+      "target": "func:src/App.tsx:processTweetsData",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:src/App.tsx:App",
+      "target": "func:src/App.tsx:handleFileUpload",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:src/App.tsx:handleFileUpload",
+      "target": "func:src/App.tsx:processTweetsData",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:src/App.tsx:App",
+      "target": "func:src/App.tsx:BookmarkCard",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:proxy/server.js:createApp",
+      "target": "func:proxy/server.js:getChildEnv",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:proxy/server.js:createApp",
+      "target": "func:proxy/server.js:sanitizeText",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:proxy/server.js",
+      "target": "file:proxy/test/mock-claude.sh",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/services/claudeService.ts",
+      "type": "file",
+      "name": "claudeService.ts",
+      "filePath": "src/services/claudeService.ts",
+      "summary": "Handles communication with the local Claude proxy server to process raw tweets. Iterates tweets one at a time (BATCH_SIZE=1), sanitizes text, POSTs to /process-tweet with retry logic (up to 3 attempts), and generates fallback results when the proxy is unavailable.",
+      "tags": ["api-client", "claude-proxy", "tweet-processing", "retry-logic", "async"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/services/claudeService.ts:sanitizeText",
+      "type": "function",
+      "name": "sanitizeText",
+      "filePath": "src/services/claudeService.ts",
+      "summary": "Strips hashtags, mentions, control characters, and truncates tweet text to 700 characters before sending to the proxy.",
+      "tags": ["text-sanitization", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/services/claudeService.ts:processBookmarksWithClaude",
+      "type": "function",
+      "name": "processBookmarksWithClaude",
+      "filePath": "src/services/claudeService.ts",
+      "summary": "Exported async function that orchestrates batch processing of raw tweets through the Claude proxy. Supports abort signals, progress callbacks, retry logic with delays, and produces fallback entries on failure.",
+      "tags": ["export", "async", "tweet-processing", "abort-signal", "progress-callback"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/services/storage.ts",
+      "type": "file",
+      "name": "storage.ts",
+      "filePath": "src/services/storage.ts",
+      "summary": "Provides a unified storage abstraction that routes reads/writes to either a VPS REST API (when VITE_STORAGE_SECRET is set) or browser localStorage. Manages bookmarks, categories, and deleted IDs with get/save/clear operations.",
+      "tags": ["storage", "api-client", "localstorage", "vps-sync", "abstraction"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/services/storage.ts:apiRequest",
+      "type": "function",
+      "name": "apiRequest",
+      "filePath": "src/services/storage.ts",
+      "summary": "Generic authenticated fetch helper for the VPS storage API. Builds URL from env config, attaches x-api-secret header, and throws on non-OK responses.",
+      "tags": ["api-client", "fetch", "authentication", "generic"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/translations.ts",
+      "type": "file",
+      "name": "translations.ts",
+      "filePath": "src/translations.ts",
+      "summary": "Centralised i18n strings for the UI, primarily in Catalan. Covers app labels, log messages, modal text, alert confirmations, default category lists, and the AI system prompt template used for Gemini/Claude categorization.",
+      "tags": ["i18n", "translations", "catalan", "constants", "prompts"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/types.ts",
+      "type": "file",
+      "name": "types.ts",
+      "filePath": "src/types.ts",
+      "summary": "Defines the core TypeScript interfaces for the application: TweetRaw (raw Twitter export shape), Bookmark (persisted entity), Category (string alias), ProcessedTweetResult (AI output), and LogEntry (import log).",
+      "tags": ["types", "interfaces", "data-model", "typescript"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/vite-env.d.ts",
+      "type": "file",
+      "name": "vite-env.d.ts",
+      "filePath": "src/vite-env.d.ts",
+      "summary": "TypeScript ambient declarations for Vite's import.meta.env, exposing VITE_API_KEY, VITE_STORAGE_API_URL, and VITE_STORAGE_SECRET as typed environment variables.",
+      "tags": ["typescript", "env", "vite", "declarations"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "src/vite.config.ts",
+      "summary": "Vite configuration for the main web app. Enables React plugin, sets dev server to port 3000 on all interfaces, injects GEMINI_API_KEY into process.env, and adds a root path alias '@'.",
+      "tags": ["vite", "config", "build", "react", "gemini"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tailwind.config.js",
+      "type": "file",
+      "name": "tailwind.config.js",
+      "filePath": "tailwind.config.js",
+      "summary": "Root Tailwind CSS configuration. Scans all HTML and src files for class usage with no custom theme extensions or plugins.",
+      "tags": ["tailwind", "config", "css", "build"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "vite.config.ts",
+      "summary": "Root Vite/Vitest configuration file. Enables the React plugin and sets the test environment to 'node'.",
+      "tags": ["vite", "vitest", "config", "build", "test"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/services/claudeService.ts",
+      "target": "file:src/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/storage.ts",
+      "target": "file:src/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/storage.ts",
+      "target": "file:src/translations.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/claudeService.ts",
+      "target": "func:src/services/claudeService.ts:sanitizeText",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/claudeService.ts",
+      "target": "func:src/services/claudeService.ts:processBookmarksWithClaude",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "func:src/services/claudeService.ts:processBookmarksWithClaude",
+      "target": "func:src/services/claudeService.ts:sanitizeText",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/claudeService.ts",
+      "target": "func:src/services/claudeService.ts:processBookmarksWithClaude",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/storage.ts",
+      "target": "func:src/services/storage.ts:apiRequest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

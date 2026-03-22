@@ -1,0 +1,90 @@
+[
+  {
+    "id": "layer:web-app",
+    "name": "Web App Layer",
+    "description": "Main React web application for bookmark management. Includes the full-featured UI (import, AI categorization, filtering, search, sync), UI primitive components, service clients for AI and storage, i18n translations, and core type definitions.",
+    "nodeIds": [
+      "file:src/App.tsx",
+      "file:src/main.tsx",
+      "file:src/components/ScrollToTop.tsx",
+      "file:src/components/UI.tsx",
+      "file:src/services/claudeService.ts",
+      "file:src/services/claudeService.test.ts",
+      "file:src/services/storage.ts",
+      "file:src/translations.ts",
+      "file:src/types.ts",
+      "file:src/vite-env.d.ts",
+      "file:src/vite.config.ts"
+    ]
+  },
+  {
+    "id": "layer:chrome-extension",
+    "name": "Chrome Extension Layer",
+    "description": "Chrome browser extension with popup UI, background service worker, content script, shared API client, shared type definitions, and build artifacts. Enables saving bookmarks directly from the browser. Includes source files, compiled artifacts, and extension-specific configuration.",
+    "nodeIds": [
+      "file:extension/popup/index.tsx",
+      "file:extension/popup/popup.tsx",
+      "file:extension/popup/singleSaveUtils.ts",
+      "file:extension/popup/tabsUtils.ts",
+      "file:extension/background/service-worker.ts",
+      "file:extension/background/service-worker.js",
+      "file:extension/content/content.ts",
+      "file:extension/content/content.js",
+      "file:extension/shared/api.ts",
+      "file:extension/shared/config.ts",
+      "file:extension/shared/types.ts",
+      "file:extension/assets/api-DyDpKlVl.js",
+      "file:extension/assets/popup-DbKNwE_q.js",
+      "file:extension/tests/single-save.test.ts",
+      "file:extension/tests/tabs-filter.test.ts",
+      "file:extension/tests/tabs-save.test.ts",
+      "file:extension/tests/tabs-selection.test.ts",
+      "file:extension/postcss.config.js",
+      "file:extension/tailwind.config.js",
+      "file:extension/vite.config.ts",
+      "file:extension/vitest.config.ts"
+    ]
+  },
+  {
+    "id": "layer:mobile-pwa",
+    "name": "Mobile PWA Layer",
+    "description": "Mobile Progressive Web App enabling bookmark saving via the native Web Share Target API. Includes the main React component, PWA service worker for offline support, URL/share-parameter utilities, configuration, and deployment script.",
+    "nodeIds": [
+      "file:mobile/src/App.tsx",
+      "file:mobile/src/main.tsx",
+      "file:mobile/src/api.ts",
+      "file:mobile/src/config.ts",
+      "file:mobile/src/utils.ts",
+      "file:mobile/src/utils.test.ts",
+      "file:mobile/public/sw.js",
+      "file:mobile/deploy.sh",
+      "file:mobile/postcss.config.js",
+      "file:mobile/tailwind.config.js",
+      "file:mobile/vite.config.ts"
+    ]
+  },
+  {
+    "id": "layer:proxy-backend",
+    "name": "Proxy Backend Layer",
+    "description": "Local Express.js proxy server that bridges the browser app to the Claude CLI. Exposes REST endpoints for AI categorization requests and streams responses. Includes installation scripts and test utilities for the proxy.",
+    "nodeIds": [
+      "file:proxy/server.js",
+      "file:proxy/install.sh",
+      "file:proxy/test/mock-claude.sh",
+      "file:proxy/test/test-install.sh"
+    ]
+  },
+  {
+    "id": "layer:infrastructure",
+    "name": "Infrastructure & Config Layer",
+    "description": "Root-level configuration, tooling, and utility scripts for the monorepo. Includes deployment scripts, ESLint config, PostCSS/Tailwind/Vite configs for the main app, and the Twitter bookmark batch-splitting utility.",
+    "nodeIds": [
+      "file:deploy-to-vps.sh",
+      "file:eslint.config.js",
+      "file:postcss.config.js",
+      "file:tailwind.config.js",
+      "file:vite.config.ts",
+      "file:split-tweets.sh"
+    ]
+  }
+]
