@@ -1,0 +1,168 @@
+{
+  "nodes": [
+    {
+      "id": "file:mobile/src/api.ts",
+      "type": "file",
+      "name": "api.ts",
+      "filePath": "mobile/src/api.ts",
+      "summary": "Thin re-export barrel for the shared extension API. Forwards getBookmarks, getCategories, saveBookmark, and isDuplicate from the shared extension module so the mobile PWA can consume the same API surface without duplication.",
+      "tags": ["api", "re-export", "barrel", "mobile", "pwa"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/src/config.ts",
+      "type": "file",
+      "name": "config.ts",
+      "filePath": "mobile/src/config.ts",
+      "summary": "Mobile PWA configuration constants: ERRORS object with Catalan-language user-facing error strings, and UI_STRINGS object with all static UI label and message strings. Serves as the single source of truth for i18n text in the mobile app.",
+      "tags": ["config", "i18n", "constants", "catalan", "mobile", "pwa"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/src/main.tsx",
+      "type": "file",
+      "name": "main.tsx",
+      "filePath": "mobile/src/main.tsx",
+      "summary": "PWA entry point: registers the service worker at /mobile/sw.js if supported, then mounts the React App component into the DOM root using React 18 createRoot with StrictMode.",
+      "tags": ["entry-point", "react", "pwa", "service-worker", "mobile"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/src/utils.test.ts",
+      "type": "file",
+      "name": "utils.test.ts",
+      "filePath": "mobile/src/utils.test.ts",
+      "summary": "Vitest unit tests for mobile utility functions. Covers resolveAuthorFromUrl (GitHub, Twitter/X, and fallback cases) and parseShareParams (url param, text param fallback, and empty input cases).",
+      "tags": ["test", "vitest", "utils", "mobile", "unit-test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/src/utils.ts",
+      "type": "file",
+      "name": "utils.ts",
+      "filePath": "mobile/src/utils.ts",
+      "summary": "Mobile PWA utility functions: resolveAuthorFromUrl infers a source label (github/twitter/web) from a URL string; parseShareParams extracts url and title from a Web Share Target query string, falling back to the text param for the URL.",
+      "tags": ["utils", "mobile", "url-parsing", "web-share", "pwa"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:mobile/src/utils.ts:resolveAuthorFromUrl",
+      "type": "function",
+      "name": "resolveAuthorFromUrl",
+      "filePath": "mobile/src/utils.ts",
+      "summary": "Infers a source/author label string ('github', 'twitter', or 'web') from a given URL by testing regex patterns.",
+      "tags": ["utility", "url", "regex"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:mobile/src/utils.ts:parseShareParams",
+      "type": "function",
+      "name": "parseShareParams",
+      "filePath": "mobile/src/utils.ts",
+      "summary": "Parses Web Share Target query string parameters into a ShareParams object with url and title fields, using the text param as a fallback for url.",
+      "tags": ["utility", "url-parsing", "web-share"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/tailwind.config.js",
+      "type": "file",
+      "name": "tailwind.config.js",
+      "filePath": "mobile/tailwind.config.js",
+      "summary": "Tailwind CSS configuration for the mobile PWA workspace. Scans HTML and all TypeScript/TSX/JS sources under src/ for class names; no theme extensions or plugins configured.",
+      "tags": ["config", "tailwind", "css", "mobile", "build"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "mobile/vite.config.ts",
+      "summary": "Vite build configuration for the mobile PWA: uses the React plugin, sets the public base path to /mobile/, outputs to dist/, and configures the jsdom test environment for Vitest.",
+      "tags": ["config", "vite", "build", "mobile", "vitest", "react"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:postcss.config.js",
+      "type": "file",
+      "name": "postcss.config.js",
+      "filePath": "postcss.config.js",
+      "summary": "Root PostCSS configuration enabling Tailwind CSS and Autoprefixer plugins for the main web app workspace.",
+      "tags": ["config", "postcss", "tailwind", "css", "build"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:proxy/install.sh",
+      "type": "file",
+      "name": "install.sh",
+      "filePath": "proxy/install.sh",
+      "summary": "macOS LaunchAgent installer script for the local Claude AI proxy server. Detects the Node.js binary path, substitutes path placeholders in a .plist template, writes the plist to ~/Library/LaunchAgents, and loads it via launchctl so the proxy starts on port 3838 at login.",
+      "tags": ["shell", "installer", "macos", "launchagent", "proxy", "claude", "devops"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:mobile/src/api.ts",
+      "target": "file:extension/shared/api.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:mobile/src/main.tsx",
+      "target": "file:mobile/src/App.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:mobile/src/utils.test.ts",
+      "target": "file:mobile/src/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:mobile/src/utils.test.ts",
+      "target": "file:mobile/src/utils.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:mobile/src/utils.ts",
+      "target": "func:mobile/src/utils.ts:resolveAuthorFromUrl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:mobile/src/utils.ts",
+      "target": "func:mobile/src/utils.ts:parseShareParams",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:mobile/src/utils.ts",
+      "target": "func:mobile/src/utils.ts:resolveAuthorFromUrl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:mobile/src/utils.ts",
+      "target": "func:mobile/src/utils.ts:parseShareParams",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:mobile/vite.config.ts",
+      "target": "file:mobile/tailwind.config.js",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

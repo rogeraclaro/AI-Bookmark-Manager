@@ -1,0 +1,184 @@
+{
+  "nodes": [
+    {
+      "id": "file:deploy-to-vps.sh",
+      "type": "file",
+      "name": "deploy-to-vps.sh",
+      "filePath": "deploy-to-vps.sh",
+      "summary": "Bash deployment script that syncs the local dist/ build to a VPS over SSH/rsync, creating a timestamped backup of the remote directory before overwriting. Targets ailinksdb.masellas.info.",
+      "tags": ["deployment", "bash", "rsync", "ssh", "vps"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:eslint.config.js",
+      "type": "file",
+      "name": "eslint.config.js",
+      "filePath": "eslint.config.js",
+      "summary": "Root ESLint flat config enabling TypeScript, React Hooks, and React Refresh rules for all .ts/.tsx files, with dist/ excluded from linting.",
+      "tags": ["eslint", "config", "typescript", "react", "tooling"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:extension/assets/api-DyDpKlVl.js",
+      "type": "file",
+      "name": "api-DyDpKlVl.js",
+      "filePath": "extension/assets/api-DyDpKlVl.js",
+      "summary": "Minified build artifact bundling the shared API layer: config constants, UI string constants (Catalan locale), and async functions for fetching/saving bookmarks and categories, plus a Claude AI categorization proxy call.",
+      "tags": ["build-artifact", "api-client", "minified", "bookmark-api", "constants"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:extension/assets/popup-DbKNwE_q.js",
+      "type": "file",
+      "name": "popup-DbKNwE_q.js",
+      "filePath": "extension/assets/popup-DbKNwE_q.js",
+      "summary": "Minified build artifact for the extension popup UI, bundling the full React popup component tree. Imports from the api build artifact.",
+      "tags": ["build-artifact", "minified", "popup", "react", "extension"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:extension/background/service-worker.js",
+      "type": "file",
+      "name": "service-worker.js",
+      "filePath": "extension/background/service-worker.js",
+      "summary": "Minified build artifact of the Chrome extension service worker. Handles CHECK_DUPLICATE, SAVE_BOOKMARK, ADD_CATEGORY, and GET_CATEGORIES messages from the popup, with in-memory category caching (5-minute TTL).",
+      "tags": ["build-artifact", "service-worker", "chrome-extension", "minified", "message-handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:extension/background/service-worker.ts",
+      "type": "file",
+      "name": "service-worker.ts",
+      "filePath": "extension/background/service-worker.ts",
+      "summary": "Chrome extension service worker source. Listens for popup messages (CHECK_DUPLICATE, SAVE_BOOKMARK, ADD_CATEGORY, GET_CATEGORIES) and dispatches to the shared API layer. Maintains an in-memory category cache with 5-minute TTL to reduce API round-trips.",
+      "tags": ["service-worker", "chrome-extension", "message-handler", "caching", "typescript"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:extension/background/service-worker.ts:getCachedCategories",
+      "type": "func",
+      "name": "getCachedCategories",
+      "filePath": "extension/background/service-worker.ts",
+      "lineRange": [10, 27],
+      "summary": "Async function that returns categories from an in-memory cache if fresh (< 5 min old), otherwise fetches from the API and updates the cache. Falls back to stale cache or ['Altres'] on error.",
+      "tags": ["caching", "async", "categories", "fallback"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:extension/content/content.js",
+      "type": "file",
+      "name": "content.js",
+      "filePath": "extension/content/content.js",
+      "summary": "Minified build artifact of the content script. Extracts page metadata (title, description, author, URL) from DOM/meta tags and responds to GET_METADATA messages from the extension popup.",
+      "tags": ["build-artifact", "content-script", "chrome-extension", "minified", "metadata"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:extension/content/content.ts",
+      "type": "file",
+      "name": "content.ts",
+      "filePath": "extension/content/content.ts",
+      "summary": "Chrome extension content script source. Scrapes page metadata (title, description, author, URL) from OG/Twitter/standard meta tags with fallback strategies, and exposes it via a chrome.runtime message listener responding to GET_METADATA.",
+      "tags": ["content-script", "chrome-extension", "metadata-extraction", "typescript", "dom"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:extension/content/content.ts:extractMetadata",
+      "type": "func",
+      "name": "extractMetadata",
+      "filePath": "extension/content/content.ts",
+      "lineRange": [4, 43],
+      "summary": "Extracts page title, description, author, and URL from the DOM using OG tags, Twitter meta tags, standard meta tags, and plain HTML elements as fallbacks. Returns an ExtractedMetadata object.",
+      "tags": ["metadata", "dom-scraping", "og-tags", "content-script"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:extension/popup/index.tsx",
+      "type": "file",
+      "name": "index.tsx",
+      "filePath": "extension/popup/index.tsx",
+      "summary": "Entry point for the Chrome extension popup. Mounts the Popup React component into the DOM root using ReactDOM.createRoot inside React.StrictMode.",
+      "tags": ["entry-point", "react", "popup", "chrome-extension", "react-dom"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:extension/assets/popup-DbKNwE_q.js",
+      "target": "file:extension/assets/api-DyDpKlVl.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/background/service-worker.js",
+      "target": "file:extension/assets/api-DyDpKlVl.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/background/service-worker.ts",
+      "target": "file:extension/shared/api.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/background/service-worker.ts",
+      "target": "file:extension/shared/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/content/content.ts",
+      "target": "file:extension/shared/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/popup/index.tsx",
+      "target": "file:extension/popup/popup.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/background/service-worker.ts",
+      "target": "func:extension/background/service-worker.ts:getCachedCategories",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:extension/content/content.ts",
+      "target": "func:extension/content/content.ts:extractMetadata",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:extension/background/service-worker.js",
+      "target": "file:extension/background/service-worker.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:extension/content/content.js",
+      "target": "file:extension/content/content.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:extension/assets/api-DyDpKlVl.js",
+      "target": "file:extension/shared/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

@@ -1,0 +1,288 @@
+{
+  "nodes": [
+    {
+      "id": "file:extension/tests/tabs-filter.test.ts",
+      "type": "file",
+      "name": "tabs-filter.test.ts",
+      "filePath": "extension/tests/tabs-filter.test.ts",
+      "summary": "Vitest unit tests for tab filtering utilities. Tests filterTabsByGroup (all tabs, ungrouped-only, specific groupId) and hasGroups from tabsUtils. Uses a local makeTabs factory for isolated test data.",
+      "tags": ["test", "vitest", "tabs", "filter", "extension"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:extension/tests/tabs-save.test.ts",
+      "type": "file",
+      "name": "tabs-save.test.ts",
+      "filePath": "extension/tests/tabs-save.test.ts",
+      "summary": "Vitest unit tests for tab save helper functions. Covers buildTabBookmark (id prefix, url mapping, default categories, timestamp) and getTabSaveSummary (counting saved/failed statuses from a Map).",
+      "tags": ["test", "vitest", "tabs", "save", "extension"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:extension/tests/tabs-selection.test.ts",
+      "type": "file",
+      "name": "tabs-selection.test.ts",
+      "filePath": "extension/tests/tabs-selection.test.ts",
+      "summary": "Vitest unit tests for tab selection utilities. Tests toggleTabSelection (add/remove/immutability), selectAllVisible, deselectAllVisible, and getSelectionCount from tabsUtils.",
+      "tags": ["test", "vitest", "tabs", "selection", "extension"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:extension/vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "extension/vite.config.ts",
+      "summary": "Vite build configuration for the browser extension. Defines three entry points (popup HTML, content script TS, service worker TS) with custom output path rules and a manualChunks strategy to inline shared modules into the service worker and content script.",
+      "tags": ["build", "vite", "extension", "config", "rollup"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:extension/vitest.config.ts",
+      "type": "file",
+      "name": "vitest.config.ts",
+      "filePath": "extension/vitest.config.ts",
+      "summary": "Vitest configuration for the extension test suite. Sets jsdom as the test environment and enables global test APIs.",
+      "tags": ["test", "vitest", "config", "extension", "jsdom"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/deploy.sh",
+      "type": "file",
+      "name": "deploy.sh",
+      "filePath": "mobile/deploy.sh",
+      "summary": "Bash deployment script for the mobile PWA. Builds the project via npm then rsync-transfers the dist/ output to the VPS path /var/www/ailinksdb.masellas.info/mobile/ with --delete to clean stale files.",
+      "tags": ["deployment", "bash", "mobile", "pwa", "rsync"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/postcss.config.js",
+      "type": "file",
+      "name": "postcss.config.js",
+      "filePath": "mobile/postcss.config.js",
+      "summary": "PostCSS configuration for the mobile PWA. Enables Tailwind CSS and autoprefixer plugins.",
+      "tags": ["config", "postcss", "tailwind", "mobile", "css"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/public/sw.js",
+      "type": "file",
+      "name": "sw.js",
+      "filePath": "mobile/public/sw.js",
+      "summary": "Minimal PWA service worker. Handles install (skipWaiting), activate (clients.claim), and fetch (passthrough) events to satisfy PWA installability requirements without any caching strategy.",
+      "tags": ["pwa", "service-worker", "mobile", "installability", "javascript"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mobile/src/App.tsx",
+      "type": "file",
+      "name": "App.tsx",
+      "filePath": "mobile/src/App.tsx",
+      "summary": "Root React component for the mobile PWA share-target flow. Manages a ViewState machine (loading/form/duplicate/success/error), loads shared URL/title from query params, fetches categories from the API, handles category selection and creation, validates and saves bookmarks with duplicate detection.",
+      "tags": ["react", "pwa", "mobile", "bookmark-save", "share-target"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:mobile/src/App.tsx:App",
+      "type": "function",
+      "name": "App",
+      "filePath": "mobile/src/App.tsx",
+      "lineRange": [9, 241],
+      "summary": "Default-exported React component. Orchestrates the full bookmark save UI with a state machine across loading, form, duplicate, success and error views. Handles category fetch, selection toggling, adding new categories, duplicate detection, and bookmark persistence.",
+      "tags": ["react-component", "state-machine", "bookmark-save", "mobile", "exported"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:mobile/src/App.tsx:loadData",
+      "type": "function",
+      "name": "loadData",
+      "filePath": "mobile/src/App.tsx",
+      "lineRange": [24, 37],
+      "summary": "Async function called on mount. Parses share URL/title from query params, fetches categories from the API (falls back to ['Altres']), then transitions view to 'form'.",
+      "tags": ["async", "data-loading", "share-target", "categories"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:mobile/src/App.tsx:handleAddCategory",
+      "type": "function",
+      "name": "handleAddCategory",
+      "filePath": "mobile/src/App.tsx",
+      "lineRange": [45, 58],
+      "summary": "Validates and adds a new category locally, then auto-selects it. Does not persist to the server — purely client-side state update.",
+      "tags": ["category", "validation", "state-update"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:mobile/src/App.tsx:handleSave",
+      "type": "function",
+      "name": "handleSave",
+      "filePath": "mobile/src/App.tsx",
+      "lineRange": [60, 91],
+      "summary": "Validates title length and URL presence, checks for duplicates via API, constructs a Bookmark object with a mob_ prefixed id, and calls saveBookmark. Transitions view state accordingly.",
+      "tags": ["save", "validation", "duplicate-check", "async", "bookmark"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:extension/tests/tabs-filter.test.ts",
+      "target": "file:extension/shared/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/tests/tabs-filter.test.ts",
+      "target": "file:extension/popup/tabsUtils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/tests/tabs-save.test.ts",
+      "target": "file:extension/shared/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/tests/tabs-save.test.ts",
+      "target": "file:extension/popup/tabsUtils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:extension/tests/tabs-selection.test.ts",
+      "target": "file:extension/popup/tabsUtils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "file:extension/shared/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "file:mobile/src/api.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "file:mobile/src/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "file:mobile/src/config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "func:mobile/src/App.tsx:App",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "func:mobile/src/App.tsx:loadData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "func:mobile/src/App.tsx:handleAddCategory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "func:mobile/src/App.tsx:handleSave",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "func:mobile/src/App.tsx:App",
+      "target": "func:mobile/src/App.tsx:loadData",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:mobile/src/App.tsx:App",
+      "target": "func:mobile/src/App.tsx:handleAddCategory",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:mobile/src/App.tsx:App",
+      "target": "func:mobile/src/App.tsx:handleSave",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:mobile/src/App.tsx",
+      "target": "func:mobile/src/App.tsx:App",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:extension/tests/tabs-filter.test.ts",
+      "target": "file:extension/vitest.config.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:extension/tests/tabs-save.test.ts",
+      "target": "file:extension/vitest.config.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:extension/tests/tabs-selection.test.ts",
+      "target": "file:extension/vitest.config.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:extension/popup/tabsUtils.ts",
+      "target": "file:extension/tests/tabs-filter.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:extension/popup/tabsUtils.ts",
+      "target": "file:extension/tests/tabs-save.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:extension/popup/tabsUtils.ts",
+      "target": "file:extension/tests/tabs-selection.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}
