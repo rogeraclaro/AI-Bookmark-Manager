@@ -42,3 +42,7 @@
         padding-top: 0.5rem !important;
     }
 }
+
+h3.font-bold.text-xl.leading-tight.mb-3 {
+    word-break: break-word;
+}
