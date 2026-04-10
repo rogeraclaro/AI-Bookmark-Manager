@@ -4,8 +4,8 @@
 
 set -e
 
-VPS_USER_HOST="${1:-user@ailinksdb.masellas.info}"
-VPS_PATH="/var/www/ailinksdb.masellas.info/mobile"
+VPS_USER_HOST="${1:-root@ailinksdb.masellas.info}"
+VPS_PATH="/home/masellas-ailinksdb/htdocs/ailinksdb.masellas.info/mobile"
 
 echo "Building..."
 npm run build
