@@ -10,7 +10,8 @@ export const ERRORS = {
 
 export const UI_STRINGS = {
   TITLE: "AI Bookmark Manager",
-  LOADING: "Carregant informació...",
+  LOADING: "Carregant enllaços...",
+  CATEGORIZING: "Analitzant amb IA...",
   SAVE: "Afegir Bookmark",
   CANCEL: "Cancel·lar",
   CLOSE: "Tancar",

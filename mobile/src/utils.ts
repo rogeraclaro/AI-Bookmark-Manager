@@ -7,11 +7,15 @@ export function resolveAuthorFromUrl(url: string): string {
 export interface ShareParams {
   url: string;
   title: string;
+  text: string;
 }
 
 export function parseShareParams(search: string): ShareParams {
   const params = new URLSearchParams(search);
-  const url = params.get('url') || params.get('text') || '';
+  const url = params.get('url') || '';
   const title = params.get('title') || '';
-  return { url, title };
+  const text = params.get('text') || '';
+  // Si no hi ha url, potser la URL ve dins de text
+  const resolvedUrl = url || text;
+  return { url: resolvedUrl, title, text: url ? text : '' };
 }
