@@ -15,7 +15,7 @@ const MoonIcon = () => (
 )
 import type { Bookmark } from '../../extension/shared/types';
 import { getCategories, saveBookmark, isDuplicate, callAICategorize } from './api';
-import { parseShareParams, resolveAuthorFromUrl } from './utils';
+import { resolveAuthorFromUrl } from './utils';
 import { UI_STRINGS, ERRORS } from './config';
 
 type ViewState = 'loading' | 'categorizing' | 'form' | 'duplicate' | 'success' | 'error';
@@ -42,14 +42,16 @@ export default function App() {
   }, []);
 
   async function loadData() {
-    const { url: sharedUrl, title: sharedTitle, text: sharedText } = parseShareParams(window.location.search);
+    // Params captured synchronously in main.tsx before React mounted.
+    // Reading from sessionStorage (not window.location.search) makes this survive
+    // React StrictMode's double-mount: both runs read the same stored values.
+    const raw = sessionStorage.getItem('__pendingShare');
+    const { url: sharedUrl, title: sharedTitle, text: sharedText } = raw
+      ? JSON.parse(raw)
+      : { url: '', title: '', text: '' };
+
     setUrl(sharedUrl);
     setTitle(sharedTitle);
-
-    // Netejar params de la URL per evitar re-processar en recarregar
-    if (window.location.search) {
-      window.history.replaceState({}, '', window.location.pathname);
-    }
 
     let cats: string[] = ['Altres'];
     try {
@@ -68,7 +70,12 @@ export default function App() {
         description: sharedText,
         categories: cats,
       });
-      if (result.title) setTitle(result.title);
+      if (result.title) {
+        setTitle(result.title);
+      } else if (!sharedTitle) {
+        // Fallback: apps like Twitter/X don't send a title param; use hostname
+        try { setTitle(new URL(sharedUrl).hostname); } catch { /* invalid URL */ }
+      }
       if (result.description) setDescription(result.description);
       if (result.categories.length > 0) setSelectedCategories(result.categories);
     }
@@ -122,6 +129,7 @@ export default function App() {
       };
 
       await saveBookmark(bookmark);
+      sessionStorage.removeItem('__pendingShare');
       setViewState('success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : ERRORS.UNKNOWN;
@@ -268,7 +276,7 @@ export default function App() {
         )}
 
         <div className="flex justify-between gap-3 pt-2 border-t-2 border-black">
-          <button onClick={() => window.close()} className="btn-secondary">
+          <button onClick={() => { sessionStorage.removeItem('__pendingShare'); window.close(); }} className="btn-secondary">
             {UI_STRINGS.CANCEL}
           </button>
           <button onClick={handleSave} className="btn-primary">
