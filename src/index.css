@@ -46,3 +46,10 @@
 h3.font-bold.text-xl.leading-tight.mb-3 {
     word-break: break-word;
 }
+
+/* mode nit */
+.dark\:bg-\[\#e8e0d0\]\/95:is(.dark *),
+.dark\:bg-\[\#e8e0d0\]:is(.dark *),
+.dark\:bg-\[\#d4c9b0\]:is(.dark *) {
+    background-color: rgb(17 24 39 / var(--tw-bg-opacity, 1));
+}
