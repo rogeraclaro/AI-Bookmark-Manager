@@ -28,7 +28,7 @@ export const processBookmarksWithClaude = async (
 ): Promise<ProcessedTweetResult[]> => {
   const proxyUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_CLAUDE_PROXY_URL)
     ? import.meta.env.VITE_CLAUDE_PROXY_URL as string
-    : 'http://localhost:3838'
+    : 'https://ailinksdb.masellas.info/api'
 
   const results: ProcessedTweetResult[] = []
   const validTweets = rawTweets.filter(t => t.full_text || t.text)
