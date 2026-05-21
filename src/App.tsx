@@ -15,13 +15,12 @@ import {
 	Calendar,
 	User,
 	Search,
-	Sun,
-	Moon,
+	LogOut,
 } from 'lucide-react'
 
 const XLogo = ({ size = 14 }: { size?: number }) => (
-	<svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-		<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.631z"/>
+	<svg width={size} height={size} viewBox='0 0 24 24' fill='currentColor' aria-hidden='true'>
+		<path d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.631z' />
 	</svg>
 )
 import type { Bookmark, Category, TweetRaw, LogEntry } from './types'
@@ -32,14 +31,32 @@ import { ScrollToTop } from './components/ScrollToTop'
 import { strings } from './translations'
 import { theme } from './theme'
 
+// --- Auth ---
+
+const ADMIN_HASH = '3fc78049b35886a8df669a3b026cb3e6f99ffac6941ea5a42d580475de3a72ae'
+
+const setCookie = (name: string, value: string, maxAge: number) => {
+	document.cookie = `${name}=${value}; max-age=${maxAge}; path=/`
+}
+
+const getCookie = (name: string): string | null => {
+	const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'))
+	return match ? decodeURIComponent(match[1]) : null
+}
+
+const deleteCookie = (name: string) => {
+	document.cookie = `${name}=; max-age=0; path=/`
+}
+
 // --- Helper Components ---
 
 const BookmarkCard: React.FC<{
 	bookmark: Bookmark
+	isLoggedIn: boolean
 	onEdit: (b: Bookmark) => void
 	onDelete: (id: string, originalId: string) => void
 	onToggleHighlight: (id: string) => void
-}> = ({ bookmark, onEdit, onDelete, onToggleHighlight }) => {
+}> = ({ bookmark, isLoggedIn, onEdit, onDelete, onToggleHighlight }) => {
 	// Extract original ID for blacklist purposes
 	const originalId = bookmark.originalLink.split('/').pop() || ''
 
@@ -48,7 +65,8 @@ const BookmarkCard: React.FC<{
 
 	return (
 		<div
-			className={`border-2 border-black p-5 h-full flex flex-col shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ${bookmark.highlighted ? 'bg-yellow-400/50' : 'bg-white'}`}
+			onClick={() => window.open(bookmark.originalLink, '_blank', 'noopener,noreferrer')}
+			className={`cursor-pointer border-2 border-black p-5 h-full flex flex-col shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ${bookmark.highlighted ? 'bg-yellow-400/50' : 'bg-white'}`}
 		>
 			<div className='flex justify-between items-start mb-2'>
 				<div className='flex flex-wrap gap-1.5'>
@@ -58,28 +76,30 @@ const BookmarkCard: React.FC<{
 						</Badge>
 					))}
 				</div>
-				<div className='flex gap-2'>
-					<button
-						onClick={(e) => {
-							e.stopPropagation()
-							onEdit(bookmark)
-						}}
-						className='p-1.5 hover:bg-yellow-300 border border-transparent hover:border-black transition-colors'
-						title={strings.modal.editTitle}
-					>
-						<Edit2 size={16} />
-					</button>
-					<button
-						onClick={(e) => {
-							e.stopPropagation()
-							onDelete(bookmark.id, originalId)
-						}}
-						className='p-1.5 hover:bg-red-500 hover:text-white border border-transparent hover:border-black transition-colors'
-						title={strings.modal.deleteTitle}
-					>
-						<Trash2 size={16} />
-					</button>
-				</div>
+				{isLoggedIn && (
+					<div className='flex gap-2'>
+						<button
+							onClick={(e) => {
+								e.stopPropagation()
+								onEdit(bookmark)
+							}}
+							className='p-1.5 hover:bg-yellow-300 border border-transparent hover:border-black transition-colors'
+							title={strings.modal.editTitle}
+						>
+							<Edit2 size={16} />
+						</button>
+						<button
+							onClick={(e) => {
+								e.stopPropagation()
+								onDelete(bookmark.id, originalId)
+							}}
+							className='p-1.5 hover:bg-red-500 hover:text-white border border-transparent hover:border-black transition-colors'
+							title={strings.modal.deleteTitle}
+						>
+							<Trash2 size={16} />
+						</button>
+					</div>
+				)}
 			</div>
 
 			{/* Meta Info: Date & Author */}
@@ -109,7 +129,7 @@ const BookmarkCard: React.FC<{
 					})()}
 			</div>
 
-			<h3 className='font-bold text-xl leading-tight mb-3'>{bookmark.title}</h3>
+			<h3 className='font-bold text-xl leading-tight mb-3 dark:text-black'>{bookmark.title}</h3>
 
 			{/* Raw Text Description */}
 			<p className='text-gray-700 font-mono mb-6 flex-grow leading-relaxed text-sm whitespace-pre-wrap break-words'>
@@ -122,26 +142,32 @@ const BookmarkCard: React.FC<{
 						href={bookmark.originalLink}
 						target='_blank'
 						rel='noopener noreferrer'
+						onClick={(e) => e.stopPropagation()}
 						className='text-xs font-bold uppercase flex items-center gap-2 hover:bg-black hover:text-white w-fit px-2 py-1 transition-colors border border-black'
 					>
-						{/twitter\.com|x\.com/i.test(bookmark.originalLink)
-						? <><XLogo size={14} /> {strings.app.viewTweet}</>
-						: <><Link2 size={14} /> {strings.app.viewLink}</>
-					}
+						{/twitter\.com|x\.com/i.test(bookmark.originalLink) ? (
+							<>
+								<XLogo size={14} /> {strings.app.viewTweet}
+							</>
+						) : (
+							<>
+								<Link2 size={14} /> {strings.app.viewLink}
+							</>
+						)}
 					</a>
-					<button
-						onClick={(e) => {
-							e.stopPropagation()
-							onToggleHighlight(bookmark.id)
-						}}
-						className={`text-xs font-bold uppercase px-2 py-1 border border-black transition-colors whitespace-nowrap ${
-							bookmark.highlighted
-								? 'bg-yellow-400 hover:bg-white'
-								: 'bg-white hover:bg-yellow-400'
-						}`}
-					>
-						{bookmark.highlighted ? strings.app.unhighlight : strings.app.highlight}
-					</button>
+					{isLoggedIn && (
+						<button
+							onClick={(e) => {
+								e.stopPropagation()
+								onToggleHighlight(bookmark.id)
+							}}
+							className={`text-xs font-bold uppercase px-2 py-1 border border-black transition-colors whitespace-nowrap ${
+								bookmark.highlighted ? 'bg-yellow-400 hover:bg-white' : 'bg-white hover:bg-yellow-400'
+							}`}
+						>
+							{bookmark.highlighted ? strings.app.unhighlight : strings.app.highlight}
+						</button>
+					)}
 				</div>
 
 				{bookmark.externalLinks.length > 0 && (
@@ -152,6 +178,7 @@ const BookmarkCard: React.FC<{
 								href={link}
 								target='_blank'
 								rel='noopener noreferrer'
+								onClick={(e) => e.stopPropagation()}
 								className='text-xs text-blue-700 truncate flex items-center gap-2 hover:underline decoration-2'
 							>
 								<LinkIcon size={12} /> {new URL(link).hostname}
@@ -172,7 +199,7 @@ export default function App() {
 	const [deletedIds, setDeletedIds] = useState<string[]>([])
 	const [isDataLoading, setIsDataLoading] = useState(true)
 	const [isLoading, setIsLoading] = useState(false)
-	const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true')
+	const [darkMode] = useState(() => localStorage.getItem('darkMode') === 'true')
 	const [progress, setProgress] = useState({ current: 0, total: 0 })
 	const [logs, setLogs] = useState<LogEntry[]>([])
 
@@ -181,9 +208,7 @@ export default function App() {
 
 	// Helper to toggle category and ensure at least one category exists
 	const toggleCategory = (cat: string, isChecked: boolean, currentCategories: string[]): string[] => {
-		const newCategories = isChecked
-			? [...currentCategories, cat]
-			: currentCategories.filter(c => c !== cat)
+		const newCategories = isChecked ? [...currentCategories, cat] : currentCategories.filter((c) => c !== cat)
 		return newCategories.length > 0 ? newCategories : ['Altres']
 	}
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
@@ -240,6 +265,13 @@ export default function App() {
 	// Result/Alert Modal State
 	const [resultModal, setResultModal] = useState<{ title: string; message: string } | null>(null)
 
+	// Login state
+	const [isLoggedIn, setIsLoggedIn] = useState(() => getCookie('session') === 'valid')
+	const [loginModalOpen, setLoginModalOpen] = useState(false)
+	const [loginUser, setLoginUser] = useState('')
+	const [loginPass, setLoginPass] = useState('')
+	const [loginError, setLoginError] = useState('')
+
 	const abortControllerRef = useRef<AbortController | null>(null)
 	const logsEndRef = useRef<HTMLDivElement>(null)
 
@@ -248,6 +280,53 @@ export default function App() {
 		document.documentElement.classList.toggle('dark', darkMode)
 		localStorage.setItem('darkMode', String(darkMode))
 	}, [darkMode])
+
+	// Renew session cookie on user activity
+	useEffect(() => {
+		if (!isLoggedIn) return
+		const renew = () => setCookie('session', 'valid', 120)
+		window.addEventListener('mousemove', renew)
+		window.addEventListener('click', renew)
+		window.addEventListener('keypress', renew)
+		return () => {
+			window.removeEventListener('mousemove', renew)
+			window.removeEventListener('click', renew)
+			window.removeEventListener('keypress', renew)
+		}
+	}, [isLoggedIn])
+
+	// Check every 10s if session cookie still exists
+	useEffect(() => {
+		const interval = setInterval(() => {
+			if (isLoggedIn && getCookie('session') !== 'valid') {
+				setIsLoggedIn(false)
+			}
+		}, 10000)
+		return () => clearInterval(interval)
+	}, [isLoggedIn])
+
+	const handleLogin = async () => {
+		const encoder = new TextEncoder()
+		const data = encoder.encode(`${loginUser}:${loginPass}`)
+		const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+		const hashArray = Array.from(new Uint8Array(hashBuffer))
+		const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+		if (hashHex === ADMIN_HASH) {
+			setCookie('session', 'valid', 120)
+			setIsLoggedIn(true)
+			setLoginModalOpen(false)
+			setLoginUser('')
+			setLoginPass('')
+			setLoginError('')
+		} else {
+			setLoginError('Credencials incorrectes')
+		}
+	}
+
+	const handleLogout = () => {
+		deleteCookie('session')
+		setIsLoggedIn(false)
+	}
 
 	// Auto-scroll logs
 	useEffect(() => {
@@ -408,7 +487,7 @@ export default function App() {
 			bookmarks.map((b) => {
 				const parts = b.originalLink.split('/')
 				return parts[parts.length - 1]
-			})
+			}),
 		)
 
 		const blacklistIds = new Set(deletedIds)
@@ -441,7 +520,7 @@ export default function App() {
 				categories,
 				(c, t) => setProgress({ current: c, total: t }),
 				addLog,
-				signal
+				signal,
 			)
 
 			const aiResults = processed.filter((p) => p.isAI)
@@ -490,9 +569,10 @@ export default function App() {
 					title: p.title || strings.defaults.untitled,
 					description: description || strings.defaults.noDescription,
 					author: author,
-					categories: p.categories && p.categories.length > 0
-				? p.categories.filter(cat => categories.includes(cat))
-				: [strings.defaults.uncategorized],
+					categories:
+						p.categories && p.categories.length > 0
+							? p.categories.filter((cat) => categories.includes(cat))
+							: [strings.defaults.uncategorized],
 					externalLinks: p.externalLinks || [],
 					originalLink: `https://twitter.com/i/web/status/${p.originalId}`,
 					createdAt: createdAt,
@@ -856,7 +936,7 @@ export default function App() {
 			prev.filter((t) => {
 				const id = t.id_str || t.id
 				return String(id) !== String(currentTweetId)
-			})
+			}),
 		)
 
 		// Check if there are more tweets to edit
@@ -902,10 +982,14 @@ export default function App() {
 				setBookmarks((prev) => {
 					const nextBooks = prev.map((b) =>
 						b.categories.includes(cat)
-						? { ...b, categories: b.categories.filter(c => c !== cat).length > 0
-							? b.categories.filter(c => c !== cat)
-							: [strings.defaults.uncategorized] }
-						: b
+							? {
+									...b,
+									categories:
+										b.categories.filter((c) => c !== cat).length > 0
+											? b.categories.filter((c) => c !== cat)
+											: [strings.defaults.uncategorized],
+								}
+							: b,
 					)
 					return nextBooks
 				})
@@ -980,9 +1064,7 @@ export default function App() {
 	}, [bookmarks, searchQuery])
 
 	const handleToggleHighlight = (id: string) => {
-		setBookmarks((prev) =>
-			prev.map((b) => (b.id === id ? { ...b, highlighted: !b.highlighted } : b))
-		)
+		setBookmarks((prev) => prev.map((b) => (b.id === id ? { ...b, highlighted: !b.highlighted } : b)))
 	}
 
 	const highlightedBookmarks = useMemo(() => {
@@ -997,7 +1079,7 @@ export default function App() {
 
 		bookmarks.forEach((b) => {
 			// Add bookmark to ALL its categories
-			const cats = b.categories || ['Altres']  // Fallback for safety
+			const cats = b.categories || ['Altres'] // Fallback for safety
 			cats.forEach((cat) => {
 				if (groups[cat]) {
 					groups[cat].push(b)
@@ -1058,90 +1140,103 @@ export default function App() {
 					</div>
 
 					<div className='flex flex-wrap gap-3 items-center justify-left'>
-						<label className='cursor-pointer'>
-							<input
-								type='file'
-								accept='.json'
-								onChange={handleFileUpload}
-								className='hidden'
-								disabled={isLoading}
-							/>
-							<div
-								className={`font-mono font-bold text-sm px-5 py-2.5 border-2 border-black flex items-center gap-2 transition-all bg-yellow-400 shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
-									isLoading ? 'cursor-not-allowed opacity-50' : ''
-								}`}
+						{!isLoggedIn && (
+							<button
+								onClick={() => setLoginModalOpen(true)}
+								className='font-mono font-bold text-sm px-5 py-2.5 border-2 border-black flex items-center gap-2 transition-all bg-yellow-400 shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
 							>
-								<Upload size={18} /> {strings.app.importJson}
-							</div>
-						</label>
-
-						{rejectedTweets.length > 0 && !isLoading && (
-							<Button
-								onClick={handleDownloadRejected}
-								variant='secondary'
-								className='py-2.5 px-4'
-								icon={<FileDown size={18} />}
-							>
-								{strings.app.downloadRejected.replace('{0}', String(rejectedTweets.length))}
-							</Button>
+								LOGIN
+							</button>
 						)}
 
-						<div className='h-8 w-px bg-gray-300 mx-1'></div>
+						{isLoggedIn && (
+							<>
+								<label className='cursor-pointer'>
+									<input
+										type='file'
+										accept='.json'
+										onChange={handleFileUpload}
+										className='hidden'
+										disabled={isLoading}
+									/>
+									<div
+										className={`font-mono font-bold text-sm px-5 py-2.5 border-2 border-black flex items-center gap-2 transition-all bg-yellow-400 shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
+											isLoading ? 'cursor-not-allowed opacity-50' : ''
+										}`}
+									>
+										<Upload size={18} /> {strings.app.importJson}
+									</div>
+								</label>
 
-						<Button
-							onClick={handleExport}
-							variant='secondary'
-							className='py-2.5 px-4'
-							icon={<Download size={18} />}
-						>
-							{strings.app.exportData}
-						</Button>
+								{rejectedTweets.length > 0 && !isLoading && (
+									<Button
+										onClick={handleDownloadRejected}
+										variant='secondary'
+										className='py-2.5 px-4'
+										icon={<FileDown size={18} />}
+									>
+										{strings.app.downloadRejected.replace('{0}', String(rejectedTweets.length))}
+									</Button>
+								)}
 
-						<Button
-							onClick={openNewBookmarkModal}
-							variant='secondary'
-							className='py-2.5 px-4'
-							icon={<Plus size={18} />}
-						>
-							{strings.app.addManual}
-						</Button>
+								<div className='h-8 w-px bg-gray-300 mx-1'></div>
 
-						<Button
-							onClick={() => setIsCategoryModalOpen(true)}
-							variant='secondary'
-							className='py-2.5 px-4'
-							icon={<Settings size={18} />}
-						>
-							{strings.app.categories}
-						</Button>
+								<Button
+									onClick={handleExport}
+									variant='secondary'
+									className='py-2.5 px-4'
+									icon={<Download size={18} />}
+								>
+									{strings.app.exportData}
+								</Button>
 
-						{hasPendingReview && rejectedTweets.length > 0 && (
-							<Button
-								onClick={() => setIsReviewModalOpen(true)}
-								variant='primary'
-								className='py-2.5 px-4 bg-orange-500 border-orange-500 hover:bg-orange-600'
-								icon={<Edit2 size={18} />}
-							>
-								Revisar Pendents ({rejectedTweets.length})
-							</Button>
+								<Button
+									onClick={openNewBookmarkModal}
+									variant='secondary'
+									className='py-2.5 px-4'
+									icon={<Plus size={18} />}
+								>
+									{strings.app.addManual}
+								</Button>
+
+								<Button
+									onClick={() => setIsCategoryModalOpen(true)}
+									variant='secondary'
+									className='py-2.5 px-4'
+									icon={<Settings size={18} />}
+								>
+									{strings.app.categories}
+								</Button>
+
+								{hasPendingReview && rejectedTweets.length > 0 && (
+									<Button
+										onClick={() => setIsReviewModalOpen(true)}
+										variant='primary'
+										className='py-2.5 px-4 bg-orange-500 border-orange-500 hover:bg-orange-600'
+										icon={<Edit2 size={18} />}
+									>
+										Revisar Pendents ({rejectedTweets.length})
+									</Button>
+								)}
+
+								<Button
+									onClick={handleResetData}
+									variant='danger'
+									className='py-2.5 px-4 reset'
+									icon={<Trash2 size={18} />}
+								>
+									RESET
+								</Button>
+
+								<button
+									onClick={handleLogout}
+									className='font-mono font-bold text-sm px-4 py-2.5 border-2 border-black flex items-center gap-2 transition-all bg-white shadow-[4px_4px_0px_0px_#000] hover:bg-red-500 hover:text-white hover:border-red-500 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
+									title='Logout'
+								>
+									<LogOut size={18} /> LOGOUT
+								</button>
+							</>
 						)}
-
-						<Button
-							onClick={handleResetData}
-							variant='danger'
-							className='py-2.5 px-4 reset'
-							icon={<Trash2 size={18} />}
-						>
-							RESET
-						</Button>
-
-						<button
-							onClick={() => setDarkMode(d => !d)}
-							className='p-2.5 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors'
-							title={darkMode ? 'Mode dia' : 'Mode nit'}
-						>
-							{darkMode ? <Sun size={18} /> : <Moon size={18} />}
-						</button>
 					</div>
 				</div>
 			</header>
@@ -1162,22 +1257,24 @@ export default function App() {
 							CERCAR
 						</button>
 						<div className='flex flex-wrap gap-2'>
-							{categories.map((cat) => {
-								const count = groupedBookmarks[cat]?.length || 0
-								if (count === 0) return null
-								return (
-									<button
-										key={cat}
-										onClick={() => scrollToCategory(cat)}
-										className='px-3 py-1 bg-white border border-black text-xs font-bold uppercase hover:bg-black hover:text-white transition-colors flex items-center gap-2 whitespace-nowrap shadow-[2px_2px_0px_0px_#ccc]'
-									>
-										{cat}
-										<span className='bg-yellow-400 text-black px-1.5 py-0.5 text-[10px] border border-black'>
-											{count}
-										</span>
-									</button>
-								)
-							})}
+							{[...categories]
+								.sort((a, b) => a.localeCompare(b))
+								.map((cat) => {
+									const count = groupedBookmarks[cat]?.length || 0
+									if (count === 0) return null
+									return (
+										<button
+											key={cat}
+											onClick={() => scrollToCategory(cat)}
+											className='px-3 py-1 bg-white text-black border border-black text-xs font-bold uppercase hover:bg-black hover:text-white transition-colors flex items-center gap-2 whitespace-nowrap shadow-[2px_2px_0px_0px_#ccc]'
+										>
+											{cat}
+											<span className='bg-yellow-400 text-black px-1.5 py-0.5 text-[10px] border border-black'>
+												{count}
+											</span>
+										</button>
+									)
+								})}
 							{highlightedBookmarks.length > 0 && (
 								<button
 									onClick={() => scrollToCategory('DESTACAT')}
@@ -1227,22 +1324,24 @@ export default function App() {
 									CERCAR
 								</span>
 							</button>
-							{categories.map((cat) => {
-								const count = groupedBookmarks[cat]?.length || 0
-								if (count === 0) return null
-								return (
-									<button
-										key={cat}
-										onClick={() => scrollToCategory(cat)}
-										className='text-left font-bold font-mono text-lg border-2 border-black p-3 hover:bg-black hover:text-white transition-all flex justify-between items-center bg-white shadow-[4px_4px_0px_0px_#ccc]'
-									>
-										{cat}
-										<span className='bg-yellow-300 text-black text-xs px-2 py-1 border border-black'>
-											{count}
-										</span>
-									</button>
-								)
-							})}
+							{[...categories]
+								.sort((a, b) => a.localeCompare(b))
+								.map((cat) => {
+									const count = groupedBookmarks[cat]?.length || 0
+									if (count === 0) return null
+									return (
+										<button
+											key={cat}
+											onClick={() => scrollToCategory(cat)}
+											className='text-left font-bold font-mono text-lg border-2 border-black p-3 hover:bg-black hover:text-white transition-all flex justify-between items-center bg-white shadow-[4px_4px_0px_0px_#ccc]'
+										>
+											{cat}
+											<span className='bg-yellow-300 text-black text-xs px-2 py-1 border border-black'>
+												{count}
+											</span>
+										</button>
+									)
+								})}
 							{highlightedBookmarks.length > 0 && (
 								<button
 									onClick={() => scrollToCategory('DESTACAT')}
@@ -1304,6 +1403,7 @@ export default function App() {
 									<BookmarkCard
 										key={bookmark.id}
 										bookmark={bookmark}
+										isLoggedIn={isLoggedIn}
 										onEdit={openEditModal}
 										onDelete={requestDelete}
 										onToggleHighlight={handleToggleHighlight}
@@ -1316,34 +1416,39 @@ export default function App() {
 
 				{/* Categories View (only show when no search) */}
 				{!searchQuery &&
-					categories.map((category) => {
-						const items = groupedBookmarks[category]
-						if (!items || items.length === 0) return null
+					[...categories]
+						.sort((a, b) => a.localeCompare(b))
+						.map((category) => {
+							const items = groupedBookmarks[category]
+							if (!items || items.length === 0) return null
 
-						return (
-							<div key={category} id={`category-${category}`} className='scroll-mt-48'>
-								<div className='flex items-center gap-4 mb-6'>
-									<h2 className='text-3xl font-black uppercase bg-black text-white px-4 py-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]'>
-										{category}
-									</h2>
-									<span className='font-mono font-bold text-xl text-gray-500'>{items.length}</span>
-									<div className='h-1 flex-grow bg-black'></div>
-								</div>
+							return (
+								<div key={category} id={`category-${category}`} className='scroll-mt-48'>
+									<div className='flex items-center gap-4 mb-6'>
+										<h2 className='text-3xl font-black uppercase bg-black text-white px-4 py-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]'>
+											{category}
+										</h2>
+										<span className='font-mono font-bold text-xl text-gray-500'>
+											{items.length}
+										</span>
+										<div className='h-1 flex-grow bg-black'></div>
+									</div>
 
-								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6'>
-									{items.map((bookmark) => (
-										<BookmarkCard
-											key={bookmark.id}
-											bookmark={bookmark}
-											onEdit={openEditModal}
-											onDelete={requestDelete}
-											onToggleHighlight={handleToggleHighlight}
-										/>
-									))}
+									<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6'>
+										{items.map((bookmark) => (
+											<BookmarkCard
+												key={bookmark.id}
+												bookmark={bookmark}
+												isLoggedIn={isLoggedIn}
+												onEdit={openEditModal}
+												onDelete={requestDelete}
+												onToggleHighlight={handleToggleHighlight}
+											/>
+										))}
+									</div>
 								</div>
-							</div>
-						)
-					})}
+							)
+						})}
 
 				{/* DESTACAT Virtual Category — always last */}
 				{!searchQuery && highlightedBookmarks.length > 0 && (
@@ -1352,7 +1457,9 @@ export default function App() {
 							<h2 className='text-3xl font-black uppercase bg-yellow-400 text-black px-4 py-2 inline-block border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]'>
 								★ {strings.app.highlightedCategory}
 							</h2>
-							<span className='font-mono font-bold text-xl text-gray-500'>{highlightedBookmarks.length}</span>
+							<span className='font-mono font-bold text-xl text-gray-500'>
+								{highlightedBookmarks.length}
+							</span>
 							<div className='h-1 flex-grow bg-yellow-400 border border-black'></div>
 						</div>
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6'>
@@ -1360,6 +1467,7 @@ export default function App() {
 								<BookmarkCard
 									key={bookmark.id}
 									bookmark={bookmark}
+									isLoggedIn={isLoggedIn}
 									onEdit={openEditModal}
 									onDelete={requestDelete}
 									onToggleHighlight={handleToggleHighlight}
@@ -1386,7 +1494,7 @@ export default function App() {
 								<span className='font-bold font-mono text-sm'>
 									{strings.app.processingProgress.replace(
 										'{0}',
-										String(Math.round((progress.current / (progress.total || 1)) * 100))
+										String(Math.round((progress.current / (progress.total || 1)) * 100)),
 									)}
 								</span>
 							</div>
@@ -1407,10 +1515,10 @@ export default function App() {
 									log.type === 'error'
 										? 'text-red-500'
 										: log.type === 'success'
-										? 'text-green-400'
-										: log.type === 'warning'
-										? 'text-yellow-400'
-										: 'text-gray-300'
+											? 'text-green-400'
+											: log.type === 'warning'
+												? 'text-yellow-400'
+												: 'text-gray-300'
 								}`}
 							>
 								<span className='opacity-50'>[{log.timestamp}]</span>
@@ -1440,7 +1548,12 @@ export default function App() {
 
 			{/* Generic Confirmation Modal (Replaces confirm() dialogs) */}
 			{confirmModal && (
-				<Modal isOpen={confirmModal.isOpen} onClose={() => setConfirmModal(null)} title={confirmModal.title} priority="high">
+				<Modal
+					isOpen={confirmModal.isOpen}
+					onClose={() => setConfirmModal(null)}
+					title={confirmModal.title}
+					priority='high'
+				>
 					<div className='mb-8'>
 						<p className='font-mono text-base whitespace-pre-wrap'>{confirmModal.message}</p>
 					</div>
@@ -1499,22 +1612,31 @@ export default function App() {
 								</div>
 								{/* Category List */}
 								<div className='p-3 space-y-2 max-h-64 overflow-y-auto'>
-									{categories.map((cat) => (
-										<label key={cat} className='flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-1'>
-											<input
-												type='checkbox'
-												checked={editingBookmark.categories.includes(cat)}
-												onChange={(e) => {
-													setEditingBookmark({
-														...editingBookmark,
-														categories: toggleCategory(cat, e.target.checked, editingBookmark.categories)
-													})
-												}}
-												className='w-4 h-4 border-2 border-black'
-											/>
-											<span className='font-mono'>{cat}</span>
-										</label>
-									))}
+									{[...categories]
+										.sort((a, b) => a.localeCompare(b))
+										.map((cat) => (
+											<label
+												key={cat}
+												className='flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-1'
+											>
+												<input
+													type='checkbox'
+													checked={editingBookmark.categories.includes(cat)}
+													onChange={(e) => {
+														setEditingBookmark({
+															...editingBookmark,
+															categories: toggleCategory(
+																cat,
+																e.target.checked,
+																editingBookmark.categories,
+															),
+														})
+													}}
+													className='w-4 h-4 border-2 border-black'
+												/>
+												<span className='font-mono'>{cat}</span>
+											</label>
+										))}
 								</div>
 							</div>
 						</div>
@@ -1598,38 +1720,37 @@ export default function App() {
 				</div>
 
 				<div className='flex flex-col gap-2'>
-					<p className='text-sm text-gray-600 font-mono mb-2'>
-						💡 Arrossega les categories per canviar l'ordre
-					</p>
-					{categories.map((cat, index) => (
-						<div
-							key={cat}
-							draggable={true}
-							onDragStart={() => handleCategoryDragStart(index)}
-							onDragOver={(e) => handleCategoryDragOver(e, index)}
-							onDrop={(e) => handleCategoryDrop(e, index)}
-							onDragEnd={handleCategoryDragEnd}
-							className={`flex justify-between items-center bg-gray-50 p-3 border-2 border-black cursor-move transition-all ${
-								draggedCategoryIndex === index ? 'opacity-50 scale-95' : ''
-							} ${
-								dragOverCategoryIndex === index && draggedCategoryIndex !== index
-									? 'border-blue-500 bg-blue-50'
-									: ''
-							}`}
-						>
-							<div className='flex items-center gap-3'>
-								<span className='text-gray-400 select-none'>☰</span>
-								<span className='font-mono font-bold'>{cat}</span>
-							</div>
-							<button
-								onClick={() => handleCategoryDelete(cat)}
-								className='text-red-500 hover:bg-red-100 p-2 border border-transparent hover:border-red-500 transition-all'
-								disabled={cat === strings.defaults.uncategorized}
+					{[...categories]
+						.sort((a, b) => a.localeCompare(b))
+						.map((cat, index) => (
+							<div
+								key={cat}
+								draggable={true}
+								onDragStart={() => handleCategoryDragStart(index)}
+								onDragOver={(e) => handleCategoryDragOver(e, index)}
+								onDrop={(e) => handleCategoryDrop(e, index)}
+								onDragEnd={handleCategoryDragEnd}
+								className={`flex justify-between items-center bg-gray-50 p-3 border-2 border-black cursor-move transition-all ${
+									draggedCategoryIndex === index ? 'opacity-50 scale-95' : ''
+								} ${
+									dragOverCategoryIndex === index && draggedCategoryIndex !== index
+										? 'border-blue-500 bg-blue-50'
+										: ''
+								}`}
 							>
-								<Trash2 size={16} />
-							</button>
-						</div>
-					))}
+								<div className='flex items-center gap-3'>
+									<span className='text-gray-400 select-none'>☰</span>
+									<span className='font-mono font-bold'>{cat}</span>
+								</div>
+								<button
+									onClick={() => handleCategoryDelete(cat)}
+									className='text-red-500 hover:bg-red-100 p-2 border border-transparent hover:border-red-500 transition-all'
+									disabled={cat === strings.defaults.uncategorized}
+								>
+									<Trash2 size={16} />
+								</button>
+							</div>
+						))}
 				</div>
 			</Modal>
 
@@ -1638,7 +1759,7 @@ export default function App() {
 				isOpen={deleteModalState.isOpen}
 				onClose={() => setDeleteModalState({ ...deleteModalState, isOpen: false })}
 				title={strings.modal.deleteTitle}
-				priority="high"
+				priority='high'
 			>
 				<div className='mb-8'>
 					<p className='font-mono text-lg'>{strings.alerts.confirmDelete}</p>
@@ -1855,22 +1976,31 @@ export default function App() {
 									</div>
 									{/* Category List */}
 									<div className='p-3 space-y-2 max-h-64 overflow-y-auto'>
-										{categories.map((cat) => (
-											<label key={cat} className='flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-1'>
-												<input
-													type='checkbox'
-													checked={editingBookmark.categories.includes(cat)}
-													onChange={(e) => {
-														setEditingBookmark({
-															...editingBookmark,
-															categories: toggleCategory(cat, e.target.checked, editingBookmark.categories)
-														})
-													}}
-													className='w-4 h-4 border-2 border-black'
-												/>
-												<span className='font-mono'>{cat}</span>
-											</label>
-										))}
+										{[...categories]
+											.sort((a, b) => a.localeCompare(b))
+											.map((cat) => (
+												<label
+													key={cat}
+													className='flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-1'
+												>
+													<input
+														type='checkbox'
+														checked={editingBookmark.categories.includes(cat)}
+														onChange={(e) => {
+															setEditingBookmark({
+																...editingBookmark,
+																categories: toggleCategory(
+																	cat,
+																	e.target.checked,
+																	editingBookmark.categories,
+																),
+															})
+														}}
+														className='w-4 h-4 border-2 border-black'
+													/>
+													<span className='font-mono'>{cat}</span>
+												</label>
+											))}
 									</div>
 								</div>
 							</div>
@@ -1880,7 +2010,9 @@ export default function App() {
 								<TextArea
 									rows={6}
 									value={editingBookmark.description}
-									onChange={(e) => setEditingBookmark({ ...editingBookmark, description: e.target.value })}
+									onChange={(e) =>
+										setEditingBookmark({ ...editingBookmark, description: e.target.value })
+									}
 								/>
 							</div>
 
@@ -1939,7 +2071,65 @@ export default function App() {
 				</Modal>
 			)}
 
-	
+			{/* Login Modal */}
+			{loginModalOpen && (
+				<div className='fixed inset-0 z-[200] bg-black/70 flex items-center justify-center p-4'>
+					<div className='bg-white border-4 border-black w-full max-w-sm shadow-[8px_8px_0px_0px_#000]'>
+						<div className='bg-yellow-400 border-b-4 border-black px-5 py-4 flex justify-between items-center'>
+							<h2 className='font-black text-xl uppercase font-mono tracking-tight'>LOGIN</h2>
+							<button
+								onClick={() => {
+									setLoginModalOpen(false)
+									setLoginError('')
+									setLoginUser('')
+									setLoginPass('')
+								}}
+								className='hover:bg-black hover:text-yellow-400 p-1 transition-colors border-2 border-transparent hover:border-black'
+							>
+								<X size={20} />
+							</button>
+						</div>
+						<div className='p-6 flex flex-col gap-4'>
+							<div className='flex flex-col gap-1'>
+								<label className='font-mono font-bold text-sm uppercase'>Usuari</label>
+								<input
+									type='text'
+									value={loginUser}
+									onChange={(e) => setLoginUser(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter') handleLogin()
+									}}
+									className='border-2 border-black px-3 py-2 font-mono text-sm focus:outline-none focus:bg-yellow-50'
+									autoFocus
+								/>
+							</div>
+							<div className='flex flex-col gap-1'>
+								<label className='font-mono font-bold text-sm uppercase'>Contrasenya</label>
+								<input
+									type='password'
+									value={loginPass}
+									onChange={(e) => setLoginPass(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter') handleLogin()
+									}}
+									className='border-2 border-black px-3 py-2 font-mono text-sm focus:outline-none focus:bg-yellow-50'
+								/>
+							</div>
+							{loginError && (
+								<p className='font-mono text-sm text-red-600 font-bold border-2 border-red-500 bg-red-50 px-3 py-2'>
+									{loginError}
+								</p>
+							)}
+							<button
+								onClick={handleLogin}
+								className='font-mono font-black text-sm px-5 py-3 border-2 border-black bg-yellow-400 shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all uppercase'
+							>
+								Entrar
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 
 			{/* Scroll to Top Button */}
 			<ScrollToTop />

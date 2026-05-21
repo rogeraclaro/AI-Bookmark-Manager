@@ -690,7 +690,7 @@ export default function Popup() {
         <div className="flex-1 overflow-y-auto divide-y divide-gray-200">
           {reviewTabs.map(tab => {
             const tabCats = tabReviewCategories.get(tab.id) ?? [];
-            const available = categories.filter(c => !tabCats.includes(c));
+            const available = [...categories].sort((a, b) => a.localeCompare(b)).filter(c => !tabCats.includes(c));
             return (
               <div key={tab.id} className="px-3 py-2 space-y-1">
                 <div className="flex items-center gap-2">
@@ -903,7 +903,7 @@ export default function Popup() {
           <label className="block font-bold text-sm mb-2">🏷️ {UI_STRINGS.LABEL_CATEGORIES}</label>
           <div className="border-2 border-black p-3 bg-gray-50 max-h-40 overflow-y-auto">
             <div className="grid grid-cols-2 gap-1">
-              {categories.map(cat => (
+              {[...categories].sort((a, b) => a.localeCompare(b)).map(cat => (
                 <label key={cat} className="checkbox-label">
                   <input
                     type="checkbox"
