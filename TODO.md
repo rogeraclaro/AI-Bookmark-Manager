@@ -2,42 +2,43 @@
 
 ## Estat actual (2026-05-22)
 
-Estem a la branch `feature/groq-migration`. La migració és **quasi completa**. Queda netejar coses obsoletes i fer merge a main.
+Branca: `feature/groq-migration`. La migració és **funcionalment completa**. Queda netejar obsolets i fer merge a main.
 
 ---
 
-## Què s'ha fet
+## Què funciona ✅
 
-### VPS (desplegat i funcionant)
-- [x] Nou `server.js` pujat a `/home/masellas-ailinksdb/backend/server.js`
-- [x] `ecosystem.config.js` actualitzat amb `GROQ_API_KEY` i `API_SECRET`
-- [x] PM2 running: `ai-bookmarks` online
-- [x] Endpoint `/categorize` — extensió Chrome i mobile PWA
-- [x] Endpoint `/process-tweet` — app web (importació massiva de tweets)
-- [x] App web desplegada a `/home/masellas-ailinksdb/htdocs/ailinksdb.masellas.info`
-
-### Bugs resolts
-- [x] Categories mai s'assignaven — fix: `x-api-secret` header + matching normalitzat + prompt més estricte
-- [x] Pàgines asiàtiques (Twitter auto-traducció) retornaven títol/descripció en idioma original — fix: prompt força SEMPRE català
-
-### Canvis locals (commitejats a `feature/groq-migration`)
-- [x] `extension/shared/config.ts` — URL canviada a `https://ailinksdb.masellas.info/api`
-- [x] `extension/shared/api.ts` — afegit `x-api-secret` header a `callClaudeProxy`
-- [x] `extension/popup/popup.tsx` — matching normalitzat (accents + minúscules) per categories
-- [x] `src/services/claudeService.ts` — URL actualitzada
-- [x] `vps-server.js` — còpia local actualitzada (prompt estricte + sempre català)
-- [x] Builds fets: app web i extensió ✅
+- VPS backend amb Groq (`llama-3.3-70b-versatile`) desplegat i running
+- App web desplegada a `https://ailinksdb.masellas.info`
+- Extensió Chrome: categories, títol i descripció correctes
+- Extensió Chrome: pàgines asiàtiques (Twitter auto-traducció) → sempre en català
+- Mobile PWA: share des de Twitter → modal s'obre, camps omplerts per IA
+  - Quan Twitter envia text del tweet → prompt de tweet
+  - Quan Twitter NO envia text (share sense contingut) → prompt genèric amb URL
 
 ---
 
-## Què falta per completar
+## Pendent per completar la migració
 
-### 1. Provar mobile PWA (si cal)
-- [ ] Compartir una URL des del mòbil → categories assignades correctament
+### 1. Verificar mobile al VPS
+Hem fet build i commit del fix de categories (matching normalitzat), però **falta confirmar si `./deploy.sh` s'ha executat** i el nou dist és al VPS.
 
-### 2. Eliminar coses obsoletes
-- [ ] Carpeta `proxy/` sencera (el proxy local ja no cal)
-- [ ] Fitxer `vps-categorize-patch.js` (substituït pel nou server.js)
+Comprova:
+```bash
+ssh root@62.169.25.188 "ls -lah /home/masellas-ailinksdb/htdocs/ailinksdb.masellas.info/mobile/"
+```
+
+Si la data dels fitxers és antiga, executa:
+```bash
+cd "/Users/rogermasellas/AI/AI Bookmark Manager/ai-bookmarks/mobile" && ./deploy.sh
+```
+
+### 2. Netejar obsolets
+```bash
+# Confirmar que res no els fa servir i eliminar:
+rm -rf proxy/
+rm vps-categorize-patch.js   # si existeix
+```
 
 ### 3. Fer merge a main
 ```bash
@@ -52,13 +53,14 @@ git branch -d feature/groq-migration
 
 ```
 Extensió Chrome
-Mobile PWA
+Mobile PWA  ──── share des de Twitter/X
 App Web
       │
       │ POST https://ailinksdb.masellas.info/api/categorize
       │ POST https://ailinksdb.masellas.info/api/process-tweet
       ▼
 VPS Backend (/home/masellas-ailinksdb/backend/server.js)
+      │  PM2: ai-bookmarks, port 3002
       │
       │ POST https://api.groq.com/openai/v1/chat/completions
       ▼
@@ -77,5 +79,22 @@ Groq API — llama-3.3-70b-versatile
 | Backend port | `3002` |
 | Groq model | `llama-3.3-70b-versatile` |
 | Branch activa | `feature/groq-migration` |
+
+---
+
+## Prompt per la propera sessió
+
+```
+Continuem la migració Groq a la branca `feature/groq-migration`.
+Llegeix el TODO.md a l'arrel del projecte per veure l'estat actual.
+
+Resum ràpid:
+- Tot funciona (extensió Chrome, mobile PWA, app web, VPS Groq)
+- Falta: verificar deploy del mobile, netejar obsolets (proxy/, vps-categorize-patch.js) i fer merge a main
+
+Comença verificant l'estat del deploy del mobile al VPS.
+```
+
+---
 
 *Actualitzat: 2026-05-22*
