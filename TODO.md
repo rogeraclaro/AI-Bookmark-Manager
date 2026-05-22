@@ -20,25 +20,11 @@ Branca: `feature/groq-migration`. La migració és **funcionalment completa**. Q
 
 ## Pendent per completar la migració
 
-### 1. Verificar mobile al VPS
-Hem fet build i commit del fix de categories (matching normalitzat), però **falta confirmar si `./deploy.sh` s'ha executat** i el nou dist és al VPS.
+### ~~1. Verificar mobile al VPS~~ ✅ (2026-05-22)
+Deploy confirmat — fitxers al VPS del 17:28, commit f8487a3 del 17:27.
 
-Comprova:
-```bash
-ssh root@62.169.25.188 "ls -lah /home/masellas-ailinksdb/htdocs/ailinksdb.masellas.info/mobile/"
-```
-
-Si la data dels fitxers és antiga, executa:
-```bash
-cd "/Users/rogermasellas/AI/AI Bookmark Manager/ai-bookmarks/mobile" && ./deploy.sh
-```
-
-### 2. Netejar obsolets
-```bash
-# Confirmar que res no els fa servir i eliminar:
-rm -rf proxy/
-rm vps-categorize-patch.js   # si existeix
-```
+### ~~2. Netejar obsolets~~ ✅ (2026-05-22)
+`proxy/` i `vps-categorize-patch.js` eliminats (commit 15791a0).
 
 ### 3. Fer merge a main
 ```bash
@@ -97,4 +83,4 @@ Comença verificant l'estat del deploy del mobile al VPS.
 
 ---
 
-*Actualitzat: 2026-05-22*
+*Actualitzat: 2026-05-22 — Neteja completada, pendent merge a main*
