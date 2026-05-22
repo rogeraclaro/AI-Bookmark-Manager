@@ -1,93 +1,45 @@
 # TODO — Migració Groq (continuar aquí)
 
-## Estat actual (2026-05-22, nit)
+## Estat actual (2026-05-22)
 
-Estem a la branch `feature/groq-migration`. La migració de Claude proxy + Gemini → Groq està **quasi completa**. El backend del VPS ja funciona amb Groq. Falta resoldre un bug de categories i desplegar els builds.
+Estem a la branch `feature/groq-migration`. La migració és **quasi completa**. Queda netejar coses obsoletes i fer merge a main.
 
 ---
 
 ## Què s'ha fet
 
-### VPS (ja desplegat i funcionant)
+### VPS (desplegat i funcionant)
 - [x] Nou `server.js` pujat a `/home/masellas-ailinksdb/backend/server.js`
-- [x] Backup del server antic a `/home/masellas-ailinksdb/backend/server.js.backup`
 - [x] `ecosystem.config.js` actualitzat amb `GROQ_API_KEY` i `API_SECRET`
-- [x] PM2 reiniciat amb `pm2 start ecosystem.config.js`
-- [x] Verificat amb curl: retorna categories, títol i descripció en català ✅
-- [x] Model: `llama-3.3-70b-versatile` via `https://api.groq.com/openai/v1/chat/completions`
-- [x] Endpoint `/categorize` — per extensió Chrome i mobile PWA
-- [x] Endpoint `/process-tweet` — per app web (importació massiva de tweets)
+- [x] PM2 running: `ai-bookmarks` online
+- [x] Endpoint `/categorize` — extensió Chrome i mobile PWA
+- [x] Endpoint `/process-tweet` — app web (importació massiva de tweets)
+- [x] App web desplegada a `/home/masellas-ailinksdb/htdocs/ailinksdb.masellas.info`
+
+### Bugs resolts
+- [x] Categories mai s'assignaven — fix: `x-api-secret` header + matching normalitzat + prompt més estricte
+- [x] Pàgines asiàtiques (Twitter auto-traducció) retornaven títol/descripció en idioma original — fix: prompt força SEMPRE català
 
 ### Canvis locals (commitejats a `feature/groq-migration`)
-- [x] `extension/shared/config.ts` — `CLAUDE_PROXY_URL` canviat de `localhost:3838` → `https://ailinksdb.masellas.info/api`
-- [x] `src/services/claudeService.ts` — proxy URL canviat de `localhost:3838` → `https://ailinksdb.masellas.info/api`
-- [x] `.env` — eliminades `VITE_API_KEY` (Gemini) i `VITE_CLAUDE_PROXY_URL`
-- [x] `vps-server.js` — còpia local del nou server.js (per referència i futurs desplegaments)
-- [x] `vps-server.env.example` — documenta les variables d'entorn necessàries al VPS
-- [x] Builds fets: `npm run build` (app web) i `cd extension && npm run build` ✅
+- [x] `extension/shared/config.ts` — URL canviada a `https://ailinksdb.masellas.info/api`
+- [x] `extension/shared/api.ts` — afegit `x-api-secret` header a `callClaudeProxy`
+- [x] `extension/popup/popup.tsx` — matching normalitzat (accents + minúscules) per categories
+- [x] `src/services/claudeService.ts` — URL actualitzada
+- [x] `vps-server.js` — còpia local actualitzada (prompt estricte + sempre català)
+- [x] Builds fets: app web i extensió ✅
 
 ---
 
-## BUG PENDENT — Categories mai s'assignen
+## Què falta per completar
 
-### Símptoma
-L'extensió (i possiblement el mobile) mai pre-selecciona categories. Títol i descripció funcionen bé, però categories sempre buides.
+### 1. Provar mobile PWA (si cal)
+- [ ] Compartir una URL des del mòbil → categories assignades correctament
 
-### Causa probable
-A `extension/popup/popup.tsx` línia 173:
-```ts
-const valid = aiResult.categories.filter(c => resolvedCats.includes(c));
-```
-Aquest filtre és una comparació estricta de strings. Groq retorna categories que no coincideixen **exactament** amb les de la llista de l'usuari (possiblement diferències d'accents, majúscules, o noms lleugerament diferents).
+### 2. Eliminar coses obsoletes
+- [ ] Carpeta `proxy/` sencera (el proxy local ja no cal)
+- [ ] Fitxer `vps-categorize-patch.js` (substituït pel nou server.js)
 
-Per exemple: Groq pot retornar `"IA"` però la categoria real es diu `"Intel·ligència Artificial"`, o retorna `"Eines IA"` però la real és `"Eines"`.
-
-### Com diagnosticar
-1. Connectar-se al VPS: `ssh root@62.169.25.188` (port podria no ser 22 — hi havia timeout, accedir des del panell del proveïdor)
-2. Executar: `pm2 logs ai-bookmarks --lines 0`
-3. Usar l'extensió en una pàgina real
-4. Veure als logs exactament quines categories retorna Groq vs. quines hi ha a la llista
-
-### Solució probable
-Dues opcions:
-- **Opció A (recomanada)**: Millorar el prompt del VPS perquè Groq retorni EXACTAMENT els strings de la llista (més instruccions explícites)
-- **Opció B**: Afegir matching case-insensitive al filtre del popup
-
----
-
-## Què falta per completar la migració
-
-### 1. Resoldre el bug de categories (veure secció anterior)
-
-### 2. Recarregar l'extensió a Chrome amb el nou build
-- Ves a `chrome://extensions`
-- Activa el mode desenvolupador
-- Clica "Recarregar" a l'extensió AI Bookmark Manager
-- O elimina-la i torna a carregar la carpeta `extension/dist/`
-
-### 3. Desplegar l'app web al VPS
-```bash
-./deploy-to-vps.sh
-```
-
-### 4. Desplegar el mobile (si cal)
-```bash
-cd mobile && npm run build && ./deploy.sh
-```
-
-### 5. Provar tot end-to-end
-- [ ] Extensió: guardar una pàgina web normal → categories assignades correctament
-- [ ] Extensió: guardar un tweet → títol descriptiu + categories
-- [ ] Extensió: guardar múltiples pestanyes
-- [ ] App web: importar JSON de tweets → processat amb Groq
-- [ ] Mobile PWA: compartir una URL → categories assignades
-
-### 6. Eliminar coses obsoletes (quan tot funcioni)
-- Carpeta `proxy/` sencera (el proxy local ja no cal)
-- Fitxer `vps-categorize-patch.js` (substituït pel nou server.js)
-- Variable `VITE_API_KEY` de Google que queda al `.gitignore` (ja eliminada del `.env`)
-
-### 7. Fer merge a main
+### 3. Fer merge a main
 ```bash
 git checkout main
 git merge feature/groq-migration
@@ -96,10 +48,10 @@ git branch -d feature/groq-migration
 
 ---
 
-## Arquitectura final (quan estigui completat)
+## Arquitectura final
 
 ```
-Extensió Chrome (qualsevol ordinador)
+Extensió Chrome
 Mobile PWA
 App Web
       │
@@ -123,14 +75,7 @@ Groq API — llama-3.3-70b-versatile
 | Backend path | `/home/masellas-ailinksdb/backend/` |
 | PM2 app name | `ai-bookmarks` |
 | Backend port | `3002` |
-| API Secret | `aAgYYud97Kp29Lif9u0i` |
 | Groq model | `llama-3.3-70b-versatile` |
 | Branch activa | `feature/groq-migration` |
 
-## Notes SSH
-- El port 22 dona timeout des de la màquina local
-- Accedir al VPS des del **panell web del proveïdor** o investigar quin port usa SSH
-
----
-
-*Creat: 2026-05-22*
+*Actualitzat: 2026-05-22*
