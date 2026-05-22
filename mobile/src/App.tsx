@@ -77,7 +77,14 @@ export default function App() {
         try { setTitle(new URL(sharedUrl).hostname); } catch { /* invalid URL */ }
       }
       if (result.description) setDescription(result.description);
-      if (result.categories.length > 0) setSelectedCategories(result.categories);
+      if (result.categories.length > 0) {
+        const normalize = (s: string) =>
+          s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+        const valid = result.categories
+          .map(c => cats.find(rc => normalize(rc) === normalize(c)))
+          .filter((rc): rc is string => rc !== undefined);
+        if (valid.length > 0) setSelectedCategories(valid);
+      }
     }
 
     setViewState('form');
