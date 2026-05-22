@@ -170,7 +170,11 @@ export default function Popup() {
         categories: resolvedCats,
       });
 
-      const valid = aiResult.categories.filter(c => resolvedCats.includes(c));
+      const normalize = (s: string) =>
+        s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+      const valid = aiResult.categories
+        .map(c => resolvedCats.find(rc => normalize(rc) === normalize(c)))
+        .filter((rc): rc is string => rc !== undefined);
       if (valid.length > 0) {
         setSelectedCategories(valid);
       }

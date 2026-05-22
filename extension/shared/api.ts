@@ -96,7 +96,10 @@ export async function callClaudeProxy(data: {
   try {
     const response = await fetch(`${CLAUDE_PROXY_URL}/categorize`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-secret': API_CONFIG.SECRET,
+      },
       body: JSON.stringify(data),
       signal: AbortSignal.timeout(30000) // 30s — tweets need more time
     });
