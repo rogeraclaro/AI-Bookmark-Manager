@@ -55,7 +55,7 @@ export const TextArea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement
 );
 
 export const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <label className="block font-bold text-xs uppercase mb-1 tracking-widest">{children}</label>
+  <label className="block font-display font-semibold text-xs uppercase mb-1 tracking-widest">{children}</label>
 );
 
 export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (props) => (
@@ -91,7 +91,7 @@ export const Modal: React.FC<{
     <div className={`fixed inset-0 ${zIndex} flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm`}>
       <div className="bg-white border-4 border-black w-full max-w-lg shadow-[8px_8px_0px_0px_#000] max-h-[90vh] flex flex-col">
         <div className="flex-shrink-0 flex justify-between items-center p-4 border-b-2 border-black bg-yellow-400">
-          <h2 className="font-bold text-xl font-mono uppercase truncate pr-4">{title}</h2>
+          <h2 className="font-display font-bold text-xl uppercase truncate pr-4">{title}</h2>
           <button onClick={onClose} className="p-1 hover:bg-black hover:text-white transition-colors border border-black">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="square" strokeLinejoin="miter">
               <path d="M18 6L6 18M6 6l12 12" />

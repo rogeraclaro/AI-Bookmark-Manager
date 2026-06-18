@@ -129,7 +129,7 @@ const BookmarkCard: React.FC<{
 					})()}
 			</div>
 
-			<h3 className='font-bold text-xl leading-tight mb-3 dark:text-black'>{bookmark.title}</h3>
+			<h3 className='font-display font-bold text-2xl leading-tight mb-3 dark:text-black'>{bookmark.title}</h3>
 
 			{/* Raw Text Description */}
 			<p className='text-gray-700 font-mono mb-6 flex-grow leading-relaxed text-sm whitespace-pre-wrap break-words'>
@@ -1130,7 +1130,7 @@ export default function App() {
 			<header className={theme.header}>
 				<div className='max-w-[1600px] mx-auto flex flex-col xl:flex-row justify-between items-center gap-6'>
 					<div className='flex items-center gap-4'>
-						<h1 className='text-4xl font-black uppercase tracking-tighter bg-black text-white px-3 py-1 inline-block transform -rotate-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]'>
+						<h1 className='font-display text-4xl font-black uppercase tracking-tighter bg-black text-white px-3 py-1 inline-block transform -rotate-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]'>
 							{strings.app.title}
 						</h1>
 						<div className='hidden md:block h-8 w-0.5 bg-black/20'></div>
@@ -1373,8 +1373,8 @@ export default function App() {
 						<div className='flex justify-center mb-6 text-gray-300'>
 							<Hash size={64} />
 						</div>
-						<h2 className='text-3xl font-bold text-gray-400 mb-4 font-mono'>{strings.app.noDataTitle}</h2>
-						<p className='text-gray-500 max-w-md mx-auto font-mono'>{strings.app.noDataDesc}</p>
+						<h2 className='font-display text-3xl font-bold text-gray-400 mb-4'>{strings.app.noDataTitle}</h2>
+						<p className='font-display text-gray-500 max-w-md mx-auto'>{strings.app.noDataDesc}</p>
 					</div>
 				)}
 
@@ -1382,7 +1382,7 @@ export default function App() {
 				{searchQuery && (
 					<div>
 						<div className='flex items-center gap-4 mb-6 flex-wrap'>
-							<h2 className='text-3xl font-black uppercase bg-yellow-400 text-black px-4 py-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] border-2 border-black'>
+							<h2 className='font-display text-3xl font-black uppercase bg-yellow-400 text-black px-4 py-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] border-2 border-black'>
 								Resultats: "{searchQuery}"
 							</h2>
 							<span className='font-mono font-bold text-xl text-gray-500'>
@@ -1433,7 +1433,7 @@ export default function App() {
 							return (
 								<div key={category} id={`category-${category}`} className='scroll-mt-48'>
 									<div className='flex items-center gap-4 mb-6'>
-										<h2 className='text-3xl font-black uppercase bg-black text-white px-4 py-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]'>
+										<h2 className='font-display text-3xl font-black uppercase bg-black text-white px-4 py-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]'>
 											{category}
 										</h2>
 										<span className='font-mono font-bold text-xl text-gray-500'>
@@ -1462,7 +1462,7 @@ export default function App() {
 				{!searchQuery && highlightedBookmarks.length > 0 && (
 					<div id='category-DESTACAT' className='scroll-mt-48'>
 						<div className='flex items-center gap-4 mb-6'>
-							<h2 className='text-3xl font-black uppercase bg-yellow-400 text-black px-4 py-2 inline-block border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]'>
+							<h2 className='font-display text-3xl font-black uppercase bg-yellow-400 text-black px-4 py-2 inline-block border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]'>
 								★ {strings.app.highlightedCategory}
 							</h2>
 							<span className='font-mono font-bold text-xl text-gray-500'>
