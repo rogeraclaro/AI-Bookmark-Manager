@@ -70,6 +70,7 @@ export default function App() {
         description: sharedText,
         categories: cats,
       });
+      if (result.resolvedUrl) setUrl(result.resolvedUrl);
       if (result.title) {
         setTitle(result.title);
       } else if (!sharedTitle) {
