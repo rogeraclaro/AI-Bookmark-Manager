@@ -346,8 +346,8 @@ tail -f /var/log/nginx/ailinksdb-error.log
 
 ```
 /home/masellas-ailinksdb/htdocs/ailinksdb.masellas.info/  → Frontend (React)
-/root/ai-bookmarks-backend/server.js                      → Backend (Express)
-/root/ai-bookmarks-backend/db.json                        → Base de dades
+/home/masellas-ailinksdb/backend/server.js                → Backend (Express)
+/home/masellas-ailinksdb/backend/db.json                  → Base de dades
 /etc/nginx/sites-available/ailinksdb.masellas.info        → Config Nginx
 /var/log/nginx/ailinksdb-error.log                        → Logs frontend
 ```
