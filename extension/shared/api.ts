@@ -92,7 +92,7 @@ export async function callClaudeProxy(data: {
   title: string;
   description: string;
   categories?: string[];
-}): Promise<{ categories: string[]; title?: string; description?: string }> {
+}): Promise<{ categories: string[]; title?: string; description?: string; error?: boolean }> {
   try {
     const response = await fetch(`${CLAUDE_PROXY_URL}/categorize`, {
       method: 'POST',
@@ -103,10 +103,10 @@ export async function callClaudeProxy(data: {
       body: JSON.stringify(data),
       signal: AbortSignal.timeout(30000) // 30s — tweets need more time
     });
-    if (!response.ok) return { categories: [] };
+    if (!response.ok) return { categories: [], error: true };
     return await response.json();
   } catch {
     // Proxy unreachable (ECONNREFUSED, timeout) — graceful fallback
-    return { categories: [] };
+    return { categories: [], error: true };
   }
 }
