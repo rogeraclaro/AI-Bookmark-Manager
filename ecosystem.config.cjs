@@ -7,8 +7,8 @@
 // (com va passar el 2026-07: pm2 va perdre API_SECRET i DEEPSEEK_API_KEY en
 // bootstrapejar un altre projecte al mateix VPS).
 //
-// El .env NO es committeja (gitignored) — crea'l al VPS a partir de
-// vps-server.env.example.
+// El .env NO es committeja (gitignored) — crea'l al VPS amb les variables
+// API_SECRET i DEEPSEEK_API_KEY.
 module.exports = {
   apps: [
     {
