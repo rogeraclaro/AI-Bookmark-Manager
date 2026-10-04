@@ -221,7 +221,7 @@ http://ailinksdb.masellas.info
 1. **Pujar un JSON de Twitter:**
    - Clica el botó de pujada
    - Selecciona un fitxer JSON
-   - Hauria de processar els tweets amb Gemini
+   - Hauria de processar els tweets amb IA (DeepSeek, via backend)
 
 2. **Verificar que es guarda al servidor:**
    - Els bookmarks es guarden al VPS (db.json)
@@ -265,7 +265,7 @@ pm2 restart ai-bookmarks
 **Solució:**
 ```bash
 # Verifica que el backend està funcionant
-curl http://localhost:3002/bookmarks -H "x-api-secret: [REDACTED-API-SECRET]"
+curl http://localhost:3002/bookmarks -H "x-api-secret: $API_SECRET"
 
 # Verifica el firewall
 ufw status
@@ -285,13 +285,13 @@ ls -lah /home/masellas-ailinksdb/htdocs/ailinksdb.masellas.info
 chmod -R 755 /home/masellas-ailinksdb/htdocs/ailinksdb.masellas.info
 ```
 
-### La pàgina carrega però no funciona Gemini
+### La pàgina carrega però no funciona la IA
 
-**Problema:** API Key de Gemini no està configurada
+**Problema:** `DEEPSEEK_API_KEY` no està configurada al backend
 
 **Solució:**
-- La clau està al frontend (compilada al build)
-- Si canvies la clau, has de fer `npm run build` i tornar a pujar
+- La clau viu al backend VPS (`vps-server.js`, model `openai/gpt-oss-20b`), no al frontend
+- Si la canvies, reinicia el procés PM2 del backend
 
 ### No puc accedir des d'un altre dispositiu
 

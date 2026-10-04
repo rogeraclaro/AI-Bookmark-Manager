@@ -1,14 +1,14 @@
-# TODO — Migració Groq (continuar aquí)
+# TODO — Migració Groq (històric; ara DeepSeek) (continuar aquí)
 
 ## Estat actual (2026-05-22)
 
-Branca: `feature/groq-migration`. La migració és **funcionalment completa**. Queda netejar obsolets i fer merge a main.
+Branca: `main`. La migració a Groq està **completa i integrada a main** (la branca `feature/groq-migration` ja no existeix; els seus commits són a l'historial de main).
 
 ---
 
 ## Què funciona ✅
 
-- VPS backend amb Groq (`llama-3.3-70b-versatile`) desplegat i running
+- VPS backend amb DeepSeek (`deepseek-flash`, V4.1 Flash) desplegat i running
 - App web desplegada a `https://ailinksdb.masellas.info`
 - Extensió Chrome: categories, títol i descripció correctes
 - Extensió Chrome: pàgines asiàtiques (Twitter auto-traducció) → sempre en català
@@ -26,12 +26,8 @@ Deploy confirmat — fitxers al VPS del 17:28, commit f8487a3 del 17:27.
 ### ~~2. Netejar obsolets~~ ✅ (2026-05-22)
 `proxy/` i `vps-categorize-patch.js` eliminats (commit 15791a0).
 
-### 3. Fer merge a main
-```bash
-git checkout main
-git merge feature/groq-migration
-git branch -d feature/groq-migration
-```
+### ~~3. Fer merge a main~~ ✅
+Integrat a main (branca `feature/groq-migration` eliminada).
 
 ---
 
@@ -48,9 +44,9 @@ App Web
 VPS Backend (/home/masellas-ailinksdb/backend/server.js)
       │  PM2: ai-bookmarks, port 3002
       │
-      │ POST https://api.groq.com/openai/v1/chat/completions
+      │ POST https://api.deepseek.com/chat/completions
       ▼
-Groq API — llama-3.3-70b-versatile
+Groq API — openai/gpt-oss-20b
 ```
 
 ---
@@ -63,24 +59,22 @@ Groq API — llama-3.3-70b-versatile
 | Backend path | `/home/masellas-ailinksdb/backend/` |
 | PM2 app name | `ai-bookmarks` |
 | Backend port | `3002` |
-| Groq model | `llama-3.3-70b-versatile` |
-| Branch activa | `feature/groq-migration` |
+| Groq model | `openai/gpt-oss-20b` |
+| Branch activa | `main` |
 
 ---
 
 ## Prompt per la propera sessió
 
 ```
-Continuem la migració Groq a la branca `feature/groq-migration`.
+Continuem el treball a la branca `main` (migració Groq completada).
 Llegeix el TODO.md a l'arrel del projecte per veure l'estat actual.
 
 Resum ràpid:
 - Tot funciona (extensió Chrome, mobile PWA, app web, VPS Groq)
-- Falta: verificar deploy del mobile, netejar obsolets (proxy/, vps-categorize-patch.js) i fer merge a main
-
-Comença verificant l'estat del deploy del mobile al VPS.
+- Migració Groq (històric; ara DeepSeek) completada (deploy mobile verificat, obsolets netejats, integrat a main)
 ```
 
 ---
 
-*Actualitzat: 2026-05-22 — Neteja completada, pendent merge a main*
+*Actualitzat: 2026-05-22 — migració Groq completada i integrada a main*
